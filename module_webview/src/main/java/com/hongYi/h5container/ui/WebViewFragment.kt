@@ -31,9 +31,9 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
 
     private var mActivity: Activity? = null
-    var mWebView: X5WebView? = null
+    lateinit var mWebView: X5WebView
     private var mCanNativeRefresh = false
-    private var mUrl: String? = null
+    private lateinit var mUrl: String
     private var mJsName = ""
     private var mIsError = false
     private var mLoadService: LoadService<*>? = null
@@ -60,7 +60,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCanNativeRefresh = arguments?.getBoolean(Constants.CAN_NATIVE_REFRESH, true)!!
-        mUrl = arguments?.getString(Constants.URL)
+        mUrl = arguments?.getString(Constants.URL)!!
         mJsName = arguments?.getString(Constants.JS_OBJECT_NAME).toString()
 
     }
@@ -74,7 +74,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
         val rootView = inflater.inflate(R.layout.fragment_webview, container, false)
         mLoadService = LoadSir.getDefault().register(rootView) {
             mLoadService!!.showCallback(LoadingCallback::class.java)
-            mWebView?.reload()
+            mWebView.reload()
         }
 
         return mLoadService?.loadLayout
@@ -94,7 +94,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
 
         val gestureDetector = GestureDetector(mActivity, OnGestureListenerImpl())
-        mWebView?.setOnTouchListener(object : View.OnTouchListener {
+        mWebView.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 gestureDetector.onTouchEvent(event)
                 return false
@@ -147,12 +147,12 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
         mWebView = WebViewManager.with(mActivity)
                 .setViewContainer(webViewContainer)
                 .setJsObjectName(mJsName)
-                .setWebUrl(mUrl!!)
+                .setWebUrl(mUrl)
                 .setWebViewCallback(this)
                 .setScrollChangedListener(this)
                 .load()
         if (mActivity is WebViewActivity)
-            (mActivity as WebViewActivity).setWebView(mWebView!!)
+            (mActivity as WebViewActivity).setWebView(mWebView)
     }
 
 
@@ -163,7 +163,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mWebView?.destroy()
+        mWebView.destroy()
     }
 
     override fun onLoadingProgress(progress: Int) {
@@ -202,7 +202,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
     override fun onRefresh(refreshLayout: RefreshLayout) {
         mIsPullRefresh = true
-        mWebView?.reload()
+        mWebView.reload()
     }
 
     override fun onScrollChanged(newY: Int, oldY: Int) {
@@ -216,11 +216,11 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
      * https://www.cnblogs.com/agilezhu/p/6689839.html
      */
     private fun heightCalculate() {
-        val scale = mWebView?.scale
-        val totalContentHeight = mWebView?.contentHeight?.times(scale!!)?.toInt()
-        val webViewHeight = mWebView?.height
+        val scale = mWebView.scale
+        val totalContentHeight = mWebView.contentHeight.times(scale).toInt()
+        val webViewHeight = mWebView.height
 
-        when (webViewHeight?.let { totalContentHeight?.minus(it) }) {
+        when (webViewHeight.let { totalContentHeight.minus(it) }) {
             0, 1 -> {
                 mIsCanScroll = false
             }
@@ -229,7 +229,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
             }
         }
 
-        LogUtils.i(TAG, "scale: $scale  contentHeight: ${mWebView?.contentHeight} totalContentHeight: $totalContentHeight" + " webViewHeight：$webViewHeight")
+        LogUtils.i(TAG, "scale: $scale  contentHeight: ${mWebView.contentHeight} totalContentHeight: $totalContentHeight" + " webViewHeight：$webViewHeight")
     }
 
 
