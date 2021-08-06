@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+
+    api 'com.tencent.tbs.tbssdk:sdk:43993'
+    implementation 'com.kingja.loadsir:loadsir:1.3.6'
+    implementation 'com.airbnb.android:lottie:2.8.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'      //核心必须依赖
+    implementation  'com.scwang.smart:refresh-header-classics:2.0.3'    //经典刷新头
+    implementation  'com.scwang.smart:refresh-header-radar:2.0.3'       //雷达刷新头
+    implementation  'com.scwang.smart:refresh-header-falsify:2.0.3'     //虚拟刷新头
+    implementation  'com.scwang.smart:refresh-header-material:2.0.3'    //谷歌刷新头
+    implementation  'com.scwang.smart:refresh-header-two-level:2.0.3'   //二级刷新头
+    implementation  'com.scwang.smart:refresh-footer-ball:2.0.3'        //球脉冲加载
+    implementation  'com.scwang.smart:refresh-footer-classics:2.0.3'    //经典加载
+
+    // kotlin使用autoservice注意事项
+    // 每个moudle都需要依赖
+    // 如果没有生成META-INF，
+    // 1、检测是否有声明@AutoService注解；2、是否有依赖apply plugin: 'kotlin-kapt'插件
+    // 3、最后rebuild，在build -> tmp -> kapt3 -> classes目录下可以查看是否成功生成META-INF
+    // https://mvnrepository.com/artifact/com.google.auto.service/auto-service
+    kapt 'com.google.auto.service:auto-service:1.0'
+    implementation 'com.google.auto.service:auto-service:1.0'
+
+
+}
