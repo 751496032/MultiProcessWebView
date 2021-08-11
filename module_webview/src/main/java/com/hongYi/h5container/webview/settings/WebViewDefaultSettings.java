@@ -64,7 +64,7 @@ public class WebViewDefaultSettings implements IWebViewSettings {
         mWebSettings.setBlockNetworkImage(false);
         // 允许加载本地文件html  file协议
         mWebSettings.setAllowFileAccess(true);
-        // 通过 file url 加载的 Javascript 读取其他的本地文件 .建议关闭
+        // 通过 file url 加载的 Javascript 读取其他的本地文件
         mWebSettings.setAllowFileAccessFromFileURLs(true);
         // 允许通过 file url 加载的 Javascript 可以访问其他的源，包括其他的文件和 http，https 等其他的源
         mWebSettings.setAllowUniversalAccessFromFileURLs(true);

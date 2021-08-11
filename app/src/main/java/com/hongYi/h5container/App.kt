@@ -11,7 +11,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
-        WebViewManager.init(this)
+        WebViewManager.init(this,false)
     }
 
     companion object {

@@ -17,7 +17,7 @@ import java.util.Stack;
 public class WebViewPool {
 
     private static final int CACHED_WEBVIEW_MAX_NUM = 2;
-    private static final Stack<X5WebView> sX5WebViewStackCached = new Stack<>();
+    private  Stack<X5WebView> mWebViewStackCached = new Stack<>();
 
     private WebViewPool() {
     }
@@ -32,9 +32,9 @@ public class WebViewPool {
 
 
     public void prepare(Context context) {
-        if (sX5WebViewStackCached.size() < CACHED_WEBVIEW_MAX_NUM) {
+        if (mWebViewStackCached.size() < CACHED_WEBVIEW_MAX_NUM) {
             X5WebView webView = createX5WebView(context);
-            sX5WebViewStackCached.push(webView);
+            mWebViewStackCached.push(webView);
         }
     }
 
@@ -44,13 +44,13 @@ public class WebViewPool {
 
 
     public X5WebView getX5WebView(Context context) {
-        if (sX5WebViewStackCached.isEmpty()) {
+        if (mWebViewStackCached.isEmpty()) {
             X5WebView webView = createX5WebView(context);
-            sX5WebViewStackCached.push(webView);
+            mWebViewStackCached.push(webView);
             return webView;
         }
         // 使用栈顶的
-        X5WebView webView = sX5WebViewStackCached.pop();
+        X5WebView webView = mWebViewStackCached.pop();
         // WebView不为空，则开始使用预创建的WebView，并且替换Context
         MutableContextWrapper contextWrapper = (MutableContextWrapper) webView.getContext();
         contextWrapper.setBaseContext(context.getApplicationContext());
@@ -58,7 +58,12 @@ public class WebViewPool {
     }
 
     public boolean isEmpty(){
-        return sX5WebViewStackCached.isEmpty();
+        return mWebViewStackCached.isEmpty();
+    }
+
+
+    public int size(){
+        return mWebViewStackCached.size();
     }
 
 

@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.hongYi.h5container.R
 import com.hongYi.h5container.utils.Constants
+import com.hongYi.h5container.utils.LogUtils
 import com.hongYi.h5container.webview.X5WebView
 import kotlinx.android.synthetic.main.activity_webview.*
 
@@ -17,8 +18,8 @@ import kotlinx.android.synthetic.main.activity_webview.*
  */
 class WebViewActivity : AppCompatActivity() {
 
-    private var mX5WebView: X5WebView? = null
-    private var mWebViewFragment: WebViewFragment? = null
+    private lateinit var mX5WebView: X5WebView
+    private val FRAGMENT_TAG = "web_fragment"
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,20 +43,26 @@ class WebViewActivity : AppCompatActivity() {
             finish()
         }
 
-        mWebViewFragment = WebViewFragment.newInstance(url!!, canNativeRefresh,jsObjectName!!)
+        val fragment = WebViewFragment.newInstance(url!!, canNativeRefresh, jsObjectName!!)
         supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_web_view, mWebViewFragment!!)
+                .replace(R.id.fragment_web_view,fragment ,FRAGMENT_TAG)
                 .commitAllowingStateLoss()
 
+//       LogUtils.d( supportFragmentManager.findFragmentByTag(FRAGMENT_TAG).hashCode().toString() + FRAGMENT_TAG)
 
+    }
+
+
+    private fun  getFragment():WebViewFragment{
+       return supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) as WebViewFragment
     }
 
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mX5WebView!!.canGoBack()) {
-                mX5WebView!!.goBack()
+            if (getFragment().mWebView.canGoBack()) {
+                getFragment().mWebView.goBack()
                 return true
             }
         }
@@ -67,11 +74,10 @@ class WebViewActivity : AppCompatActivity() {
         toolbar.title = title
     }
 
+    @Deprecated("过时")
     fun setWebView(webView: X5WebView) {
         mX5WebView = webView
     }
-
-
 
 
 }

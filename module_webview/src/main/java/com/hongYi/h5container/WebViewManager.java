@@ -1,9 +1,10 @@
 package com.hongYi.h5container;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 
 import androidx.annotation.NonNull;
 
@@ -26,6 +27,7 @@ import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebViewClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,8 +50,8 @@ public class WebViewManager {
         HashMap<String, Object> map = new HashMap<>();
         map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
         map.put(TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE, true);
-        X5WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
         QbSdk.initTbsSettings(map);
+        X5WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
 
         LoadSir.beginBuilder()
                 .addCallback(new ErrorCallback())//添加各种状态页
@@ -63,10 +65,44 @@ public class WebViewManager {
 
     }
 
-
+    /**
+     * 默认在主进程初始化
+     * @param context
+     */
     public static void init(Context context) {
+        init(context, true);
+    }
+
+    /**
+     * 初始化
+     * @param context
+     * @param mainProcessNeed false：在非主进程初始化
+     */
+    public static void init(Context context, boolean mainProcessNeed) {
+        String processName = getProcessName(context);
+        String packageName = context.getApplicationContext().getPackageName();
+        if (!mainProcessNeed && TextUtils.equals(processName, packageName))
+            return;
         init();
         WebViewPool.getInstance().prepare(context);
+        LogUtils.i(TAG, "init ProcessName : " + processName
+                + " size: " + WebViewPool.getInstance().size());
+    }
+
+
+    public static String getProcessName(Context cxt) {
+        int pid = android.os.Process.myPid();
+        ActivityManager am = (ActivityManager) cxt.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
+        if (runningApps == null) {
+            return null;
+        }
+        for (ActivityManager.RunningAppProcessInfo procInfo : runningApps) {
+            if (procInfo.pid == pid) {
+                return procInfo.processName;
+            }
+        }
+        return null;
     }
 
 
@@ -83,11 +119,13 @@ public class WebViewManager {
         if (mWebView == null) throw new NullPointerException("WebView没有初始化");
         addToParentView(builder);
 
+        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速
+
         if (builder.mWebSettings != null) builder.mWebSettings.setSettings(mWebView);
         mWebView.setOnScrollChangedListener(builder.mScrollChangedListener);
         mWebView.setWebViewClient(builder.mWebViewClient == null ? createDefWebViewClient(builder) : builder.mWebViewClient);
         mWebView.setWebChromeClient(builder.mWebChromeClient == null ? createDefWebChromeClient(builder) : builder.mWebChromeClient);
-        mWebView.injectJsObject(builder.mJsObjectName);
+        mWebView.registerJsInterface(builder.mJsObjectName);
         loadUrl();
     }
 

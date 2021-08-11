@@ -151,6 +151,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
                 .setWebViewCallback(this)
                 .setScrollChangedListener(this)
                 .load()
+        mWebView.injectJsCode()
         if (mActivity is WebViewActivity)
             (mActivity as WebViewActivity).setWebView(mWebView)
     }

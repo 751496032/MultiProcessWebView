@@ -32,6 +32,8 @@ public class X5WebView extends WebView {
 
     private OnScrollChangedListener mOnScrollChangedListener;
 
+    private String mJsObjectName;
+
     public X5WebView(Context context) {
         super(context);
         init();
@@ -51,19 +53,21 @@ public class X5WebView extends WebView {
     private void init() {
         bindMainProcessServiceAidl();
         WebViewDefaultSettings.getInstance().setSettings(this);
-        ViewHelper.setDrawDuringWindowsAnimating(this);
+//        ViewHelper.setDrawDuringWindowsAnimating(this);
 
     }
 
     public void bindMainProcessServiceAidl() {
         // 绑定主进程服务
         Intent intent = new Intent(getContext().getApplicationContext(), MainCommandService.class);
-        getContext().getApplicationContext().bindService(intent, WebViewCommandDispatcher.Companion.getINSTANCE(),BIND_AUTO_CREATE);
+        getContext().getApplicationContext().bindService(intent, WebViewCommandDispatcher.Companion.getINSTANCE(), BIND_AUTO_CREATE);
     }
 
-    public void injectJsObject(String name) {
-        if (!TextUtils.isEmpty(name))
+    public void registerJsInterface(String name) {
+        if (!TextUtils.isEmpty(name)) {
+            mJsObjectName = name;
             addJavascriptInterface(this, name);
+        }
     }
 
     /**
@@ -78,23 +82,24 @@ public class X5WebView extends WebView {
         Gson gson = new Gson();
         JsParam jsParamObject = gson.fromJson(jsParam, JsParam.class);
         String params = gson.toJson(jsParamObject.param);
-        WebViewCommandDispatcher.Companion.getINSTANCE().dispatcherCommand(jsParamObject.name, params,this);
+        WebViewCommandDispatcher.Companion.getINSTANCE().dispatcherCommand(jsParamObject.name, params, this);
 
     }
 
     /**
      * 将结果回调给Js
+     *
      * @param callbackName
      * @param response
      */
-    public void  handleWebCallback(final String callbackName, final String response){
-        LogUtils.i("callbackName: "+callbackName+"  response: "+response);
-        if (TextUtils.isEmpty(callbackName))return;
+    public void handleWebCallback(final String callbackName, final String response) {
+        LogUtils.i("handleWebCallback  callbackName: " + callbackName + "  response: " + response);
+        if (TextUtils.isEmpty(callbackName)) return;
         post(new Runnable() {
             @Override
             public void run() {
                 String jscode = "javascript:global.callback('" + callbackName + "'," + response + ")";
-                LogUtils.i("jscode: "+jscode);
+                LogUtils.i("jscode: " + jscode);
                 evaluateJavascript(jscode, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String s) {
@@ -105,9 +110,31 @@ public class X5WebView extends WebView {
         });
     }
 
+
+    public void injectJsCode(final String jscode) {
+        LogUtils.i("injectJsCode  jscode: " +jscode);
+        if (TextUtils.isEmpty(jscode)) return;
+        post(new Runnable() {
+            @Override
+            public void run() {
+                loadUrl(jscode);
+            }
+        });
+    }
+
+
+    public void injectJsCode(){
+        String js="javascript:(function(){" +
+                "document.documentElement.style.overflow='visible';})()";
+        injectJsCode(js);
+    }
+
+
+
     @Override
     public void destroy() {
         stopLoading();
+        if (!TextUtils.isEmpty(mJsObjectName)) removeJavascriptInterface(mJsObjectName);
         boolean empty = WebViewPool.getInstance().isEmpty();
         if (empty) {
             super.destroy();
@@ -115,6 +142,11 @@ public class X5WebView extends WebView {
 
     }
 
+    @Override
+    protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
+        LogUtils.i("overScrollBy: "+ deltaY +"  "+ scrollY +"  "+ scrollRangeY);
+        return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
+    }
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
