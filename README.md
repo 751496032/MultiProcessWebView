@@ -154,7 +154,9 @@ Js发送携带的参数，可以在executeCommand()方法中parameters中取出�
 
 > 参考 https://github.com/al-liu/OCat-MobilePlatform
 
-[代码地址](https://github.com/751496032/MultiProcessWebView)
+## Js与native交互
+
+[Js与native交互的使用文档](https://github.com/751496032/hYi-sdk)
 
 ##  参考
 
