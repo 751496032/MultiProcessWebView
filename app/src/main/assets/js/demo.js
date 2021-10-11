@@ -3,10 +3,10 @@ global.callbacks = {}
 
 global.callback = function (callbackName, response) {
    var callbackObject = global.callbacks[callbackName];
-   console.log("xxxx"+callbackName);
+   console.log("callbackName: "+callbackName);
    if (callbackObject !== undefined){
        if(callbackObject.callback != undefined){
-          console.log("xxxxxx"+response);
+          console.log("callbackName: "+callbackName +", response: "+response);
             var ret = callbackObject.callback(response);
            if(ret === false){
                return
@@ -21,7 +21,7 @@ global.takeNativeAction = function(commandName, parameters){
     var request = {};
     request.name = commandName;
     request.param = parameters;
-    window.xxwebview.takeNativeAction(JSON.stringify(request));
+    window.hYi.takeNativeAction(JSON.stringify(request));
 }
 
 global.takeNativeActionWithCallback = function(commandName, parameters, callback) {
@@ -32,7 +32,7 @@ global.takeNativeActionWithCallback = function(commandName, parameters, callback
     request.name = commandName;
     request.param = parameters;
     request.param.callbackName = callbackName;
-    window.xxwebview.takeNativeAction(JSON.stringify(request));
+    window.hYi.takeNativeAction(JSON.stringify(request));
 }
 
 window.global = global;

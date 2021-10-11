@@ -19,7 +19,7 @@ class CommandShowToast : Command {
         return "showToast"
     }
 
-    override fun executeCommand(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+    override fun executeCommand(parameters: Map<*, *>, webInterface: ICallbackFromMainToWebInterface) {
         LogUtils.d("executeCommand curr thread "+ Thread.currentThread().name)
         Toast.makeText(App.INSTANCE, parameters["message"].toString(), Toast.LENGTH_SHORT).show()
     }

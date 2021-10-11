@@ -151,7 +151,7 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
                 .setWebViewCallback(this)
                 .setScrollChangedListener(this)
                 .load()
-        mWebView.injectJsCode()
+//        mWebView.injectJsCode()
         if (mActivity is WebViewActivity)
             (mActivity as WebViewActivity).setWebView(mWebView)
     }
@@ -162,8 +162,8 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
         mActivity = null
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         mWebView.destroy()
     }
 

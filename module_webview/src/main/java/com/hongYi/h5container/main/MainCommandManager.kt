@@ -14,7 +14,7 @@ import kotlin.collections.HashMap
 /**
  *@author: HZWei
  *@date:  2021/8/5
- *@desc:  所有Command的管理者
+ *@desc:  Command的管理者
  */
 class MainCommandManager private constructor() : IWebToMainInterface.Stub() {
 

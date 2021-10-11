@@ -46,7 +46,7 @@ class WebViewActivity : AppCompatActivity() {
         val fragment = WebViewFragment.newInstance(url!!, canNativeRefresh, jsObjectName!!)
         supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_web_view,fragment ,FRAGMENT_TAG)
+                .replace(R.id.fragment_web_view, fragment, FRAGMENT_TAG)
                 .commitAllowingStateLoss()
 
 //       LogUtils.d( supportFragmentManager.findFragmentByTag(FRAGMENT_TAG).hashCode().toString() + FRAGMENT_TAG)
@@ -54,8 +54,8 @@ class WebViewActivity : AppCompatActivity() {
     }
 
 
-    private fun  getFragment():WebViewFragment{
-       return supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) as WebViewFragment
+    private fun getFragment(): WebViewFragment {
+        return supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) as WebViewFragment
     }
 
 

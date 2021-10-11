@@ -16,27 +16,41 @@
          margin-top: 20px;
          }
 
+
+
     </style>
-    <script src="js/demo.js" charset="utf-8"></script>
+    <!--    <script src="js/demo.js" charset="utf-8"></script>-->
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/gh/751496032/hYi-sdk@1.0.0/hYi-sdk.js"></script>
     <script>
         function callAppToast(){
             console.log("callAppToast.");
-            window.global.takeNativeAction("showToast", {message: "来自html的消息"});
+            window.takeNativeActionWithCallback("showToast", {message: "来自html的消息"});
         }
         function openActivity(){
             console.log("openActivity.");
-            window.global.takeNativeAction("openPage", {target_class: "com.hongYi.h5container.WebViewTestActivity"});
+            window.takeNativeActionWithCallback("openPage", {target_class: "com.hongYi.h5container.WebViewTestActivity"});
         }
-        function login(){
+         function login() {
             console.log("login.");
-            window.global.takeNativeActionWithCallback("login", {}, function(res) {
-                 var element = document.createElement("div");
-                 element.appendChild(document.createTextNode("userName: "+res.accountName));
-                 document.getElementById('login_id').appendChild(element);
+            window.takeNativeActionWithCallback("login", {
+                success: function (res) {
+                    console.log("success res: " + JSON.stringify(res))
+                    var element = document.createElement("div");
+                    element.appendChild(document.createTextNode("success\n userName: " + res.accountName));
+                    document.getElementById('login_id').appendChild(element);
+                },
+                fail: function (res) {
+                    console.log("fail res: " + JSON.stringify(res))
+                },
+                complete: function () {
+                    console.log("complete res ")
+                    var element = document.createElement("div");
+                    element.appendChild(document.createTextNode("\ncomplete"));
+                    document.getElementById('login_id').appendChild(element);
+                }
             });
         }
-
-
 
     </script>
 

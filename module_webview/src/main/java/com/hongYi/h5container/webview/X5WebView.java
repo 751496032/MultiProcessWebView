@@ -73,7 +73,9 @@ public class X5WebView extends WebView {
     /**
      * js调用原生统一函数
      *
-     * @param jsParam js传入的参数，json格式字符串
+     * @param jsParam js传入的参数，json字符串，格式如下：
+     * {"name":"login","param":{"targetClassName":"com.xxx","callbackNameKeys":["success_nativetojs_callback_1633683965180_6434","fail_nativetojs_callback_1633683965180_6434","complete_nativetojs_callback_1633683965180_6434"]}}
+     * 其中param对象中callbackNameKeys字段是一定存在的，当没有Js没有回调函数时，是一个空数组，其他字段都是业务字段
      */
     @JavascriptInterface
     public void takeNativeAction(String jsParam) {
@@ -89,16 +91,16 @@ public class X5WebView extends WebView {
     /**
      * 将结果回调给Js
      *
-     * @param callbackName
-     * @param response
+     * @param callbackNameKey Js回调函数名称key，在Js中会根据key来查找对应回调函数
+     * @param response  Json字符串
      */
-    public void handleWebCallback(final String callbackName, final String response) {
-        LogUtils.i("handleWebCallback  callbackName: " + callbackName + "  response: " + response);
-        if (TextUtils.isEmpty(callbackName)) return;
+    public void handleWebCallback(final String callbackNameKey, final String response) {
+        LogUtils.i("handleWebCallback  callbackNameKey: " + callbackNameKey + "  response: " + response);
+        if (TextUtils.isEmpty(callbackNameKey)) return;
         post(new Runnable() {
             @Override
             public void run() {
-                String jscode = "javascript:global.callback('" + callbackName + "'," + response + ")";
+                String jscode = "javascript:window.nativetoJsCallback('" + callbackNameKey + "'," + response + ")";
                 LogUtils.i("jscode: " + jscode);
                 evaluateJavascript(jscode, new ValueCallback<String>() {
                     @Override

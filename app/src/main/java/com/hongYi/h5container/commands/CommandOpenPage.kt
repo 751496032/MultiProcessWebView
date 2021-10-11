@@ -18,7 +18,7 @@ class CommandOpenPage : Command {
         return "openPage"
     }
 
-    override fun executeCommand(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+    override fun executeCommand(parameters: Map<*, *>, webInterface: ICallbackFromMainToWebInterface) {
         val intent = Intent()
         intent.setClassName(App.INSTANCE.packageName, parameters["target_class"].toString())
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

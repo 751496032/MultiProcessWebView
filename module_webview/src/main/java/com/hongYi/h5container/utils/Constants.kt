@@ -15,7 +15,6 @@ object Constants {
     const val IS_SHOW_ACTION_BAR = "is_show_action_bar"
     const val CAN_NATIVE_REFRESH = "can_native_refresh"
     const val ANDROID_ASSET_URI = "file:///android_asset/"
-    const val JS_OBJECT_NAME="js_object_name"
-
+    const val JS_OBJECT_NAME = "js_object_name"
 
 }

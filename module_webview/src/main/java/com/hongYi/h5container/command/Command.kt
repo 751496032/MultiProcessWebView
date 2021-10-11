@@ -11,7 +11,7 @@ interface Command {
 
     fun commandName(): String
 
-    fun executeCommand(parameters: Map<*,*>, callback: ICallbackFromMainToWebInterface)
+    fun executeCommand(parameters: Map<*,*>, webInterface: ICallbackFromMainToWebInterface)
 
 
 }

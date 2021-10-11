@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, clazz);
         intent.putExtra(Constants.URL, url);
         intent.putExtra(Constants.TITLE, title);
-        intent.putExtra(Constants.JS_OBJECT_NAME,"xxwebview");
+        intent.putExtra(Constants.JS_OBJECT_NAME,"hYi");
         startActivity(intent);
     }
 }

@@ -11,5 +11,5 @@ interface ICallbackFromMainToWebInterface {
 //    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
 //            double aDouble, String aString);
 
-     void handleWebCallback(String jsCallbackName, String result);
+     void handleWebCallback(String jsCallbackNameKey, String result);
 }
