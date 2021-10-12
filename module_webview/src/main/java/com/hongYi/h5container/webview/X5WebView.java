@@ -88,6 +88,11 @@ public class X5WebView extends WebView {
 
     }
 
+    @JavascriptInterface
+    public void config(String jsParam){
+        LogUtils.i("config: " + jsParam);
+    }
+
     /**
      * 将结果回调给Js
      *
