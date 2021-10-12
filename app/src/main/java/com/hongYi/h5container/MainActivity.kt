@@ -8,11 +8,12 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import com.hongYi.h5container.business.FileOperateActivity
 import com.hongYi.h5container.ui.WebViewActivity
 import com.hongYi.h5container.utils.Constants
 
 class MainActivity : AppCompatActivity() {
-    var data = arrayOf("百度", "控价系统H5", "商城H5", "demo.html", "优化前WebView")
+    var data = arrayOf("百度", "控价系统H5", "商城H5", "demo.html", "优化前WebView", "文件下载、解压、展示")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(WebViewActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
                 3 -> startActivity(WebViewActivity::class.java, Constants.ANDROID_ASSET_URI + "demo.html", data[position])
                 4 -> startActivity(WebViewTestActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
+                5 -> startActivity(FileOperateActivity::class.java, "", "")
             }
         }
     }
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(Constants.URL, url)
         intent.putExtra(Constants.TITLE, title)
         intent.putExtra(Constants.JS_OBJECT_NAME, "hYi")
-        intent.putExtra(Constants.CAN_NATIVE_REFRESH,false)
+        intent.putExtra(Constants.CAN_NATIVE_REFRESH, false)
         startActivity(intent)
     }
 }
