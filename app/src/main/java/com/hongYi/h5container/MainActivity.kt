@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                 2 ->
                     // https://book.douban.com/subject/10785583/
                     // http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1
-                    startActivity(WebViewActivity::class.java, "https://m.douban.com/subject/10785583/", data[position])
+                    startActivity(WebViewActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
                 3 -> startActivity(WebViewActivity::class.java, Constants.ANDROID_ASSET_URI + "demo.html", data[position])
                 4 -> startActivity(WebViewTestActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
             }

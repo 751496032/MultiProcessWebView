@@ -44,13 +44,14 @@ public class WebViewPool {
 
 
     public X5WebView getX5WebView(Context context) {
-        if (mWebViewStackCached.isEmpty()) {
-            X5WebView webView = createX5WebView(context);
-            mWebViewStackCached.push(webView);
-            return webView;
-        }
+//        if (mWebViewStackCached.isEmpty()) {
+//            X5WebView webView = createX5WebView(context);
+//            mWebViewStackCached.push(webView);
+//            return webView;
+//        }
         // 使用栈顶的
-        X5WebView webView = mWebViewStackCached.pop();
+//        X5WebView webView = mWebViewStackCached.pop();
+        X5WebView webView =  createX5WebView(context);
         // WebView不为空，则开始使用预创建的WebView，并且替换Context
         MutableContextWrapper contextWrapper = (MutableContextWrapper) webView.getContext();
         contextWrapper.setBaseContext(context.getApplicationContext());
