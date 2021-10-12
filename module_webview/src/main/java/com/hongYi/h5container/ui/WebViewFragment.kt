@@ -3,9 +3,11 @@ package com.hongYi.h5container.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import com.hongYi.h5container.BuildConfig
 import com.hongYi.h5container.WebViewManager
 import com.hongYi.h5container.R
 import com.hongYi.h5container.loadsir.ErrorCallback
@@ -20,6 +22,7 @@ import com.kingja.loadsir.core.LoadSir
 import com.scwang.smart.refresh.header.ClassicsHeader
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
 import kotlinx.android.synthetic.main.fragment_webview.*
 
 /**
@@ -80,7 +83,6 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
         return mLoadService?.loadLayout
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         smartRefreshLayout.setEnableAutoLoadMore(false)
@@ -89,18 +91,118 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
         smartRefreshLayout.setRefreshHeader(ClassicsHeader(mActivity))
         smartRefreshLayout.setOnRefreshListener(this)
 
-
         initWebView()
 
+//        addTouchEvent()
 
-        val gestureDetector = GestureDetector(mActivity, OnGestureListenerImpl())
-        mWebView.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                gestureDetector.onTouchEvent(event)
-                return false
+    }
+
+    private fun initWebView() {
+        mWebView = WebViewManager.with(mActivity)
+                .setViewContainer(webViewContainer)
+                .setJsObjectName(mJsName)
+                .setWebUrl(mUrl)
+                .setWebViewCallback(this)
+                .load()
+//        mWebView.injectJsCode()
+//        if (mActivity is WebViewActivity)
+//            (mActivity as WebViewActivity).setWebView(mWebView)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mWebView.destroy()
+    }
+
+    override fun onLoadingProgress(progress: Int) {
+        if (progress == 100) pageLoadedComplete()
+    }
+
+    override fun onUpdateTitle(title: String) {
+        if (mActivity is WebViewActivity) {
+            (mActivity as WebViewActivity).updateTitle(title)
+        }
+    }
+
+    override fun onPageStarted() {
+        if (!mIsPullRefresh && mLoadService?.currentCallback != SuccessCallback::class.java)
+            mLoadService?.showCallback(LoadingCallback::class.java)
+    }
+
+    override fun onPageFinished() {
+//        pageLoadedComplete()
+    }
+
+    private fun pageLoadedComplete() {
+        if (smartRefreshLayout == null) return
+        if (mIsError) {
+            smartRefreshLayout.setEnableRefresh(true)
+            mLoadService!!.showCallback(ErrorCallback::class.java)
+        } else {
+            smartRefreshLayout.setEnableRefresh(mCanNativeRefresh)
+            mLoadService!!.showSuccess()
+        }
+        smartRefreshLayout.finishRefresh()
+        mIsError = false
+        mIsPullRefresh = false
+        //        heightCalculate()
+    }
+
+    override fun onPageError(stateCode: Int, error: String) {
+        mIsError = true
+        smartRefreshLayout.finishRefresh()
+    }
+
+    private val mRequestCache = ArrayList<String>(8)
+    override fun onInterceptLoading(webResourceRequest: WebResourceRequest, requestUrl: String): Boolean {
+
+        if (webResourceRequest.isRedirect) {
+            return false
+        } else {
+            if (mRequestCache.contains(requestUrl)) {
+                val index = mRequestCache.indexOf(requestUrl)
+                if (index == mRequestCache.size - 1) {
+                    return false
+                }
             }
-        })
+            if (mRequestCache.size == 8) {
+                mRequestCache.removeAt(0)
+            }
+            mRequestCache.add(requestUrl)
+            startActivity(WebViewActivity::class.java, requestUrl, "")
+            return true
+        }
 
+    }
+
+
+    override fun onRefresh(refreshLayout: RefreshLayout) {
+        mIsPullRefresh = true
+        mWebView.reload()
+    }
+
+
+    private fun startActivity(clazz: Class<*>, url: String, title: String) {
+        val intent = Intent(mActivity, clazz)
+        intent.putExtra(Constants.URL, url)
+        intent.putExtra(Constants.TITLE, title)
+        intent.putExtra(Constants.JS_OBJECT_NAME, "hYi")
+        intent.putExtra(Constants.CAN_NATIVE_REFRESH, false)
+        startActivity(intent)
+    }
+
+
+    /*---------------------------------以下可以忽略------------------------------------------*/
+
+    @Deprecated("测试")
+    @SuppressLint("ClickableViewAccessibility")
+    private fun addTouchEvent() {
+        if (!BuildConfig.DEBUG) return
+        val gestureDetector = GestureDetector(mActivity, OnGestureListenerImpl())
+        mWebView.setOnTouchListener { v, event ->
+            gestureDetector.onTouchEvent(event)
+            false
+        }
     }
 
 
@@ -142,69 +244,6 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
     }
 
-
-    private fun initWebView() {
-        mWebView = WebViewManager.with(mActivity)
-                .setViewContainer(webViewContainer)
-                .setJsObjectName(mJsName)
-                .setWebUrl(mUrl)
-                .setWebViewCallback(this)
-                .setScrollChangedListener(this)
-                .load()
-//        mWebView.injectJsCode()
-        if (mActivity is WebViewActivity)
-            (mActivity as WebViewActivity).setWebView(mWebView)
-    }
-
-
-    override fun onDetach() {
-        super.onDetach()
-        mActivity = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mWebView.destroy()
-    }
-
-    override fun onLoadingProgress(progress: Int) {
-
-    }
-
-    override fun onUpdateTitle(title: String) {
-        if (mActivity is WebViewActivity) {
-            (mActivity as WebViewActivity).updateTitle(title)
-        }
-    }
-
-    override fun onPageStarted() {
-        if (!mIsPullRefresh && mLoadService?.currentCallback != SuccessCallback::class.java)
-            mLoadService?.showCallback(LoadingCallback::class.java)
-    }
-
-    override fun onPageFinished() {
-        if (mIsError) {
-            smartRefreshLayout.setEnableRefresh(true)
-            mLoadService!!.showCallback(ErrorCallback::class.java)
-        } else {
-            smartRefreshLayout.setEnableRefresh(mCanNativeRefresh)
-            mLoadService!!.showSuccess()
-        }
-        smartRefreshLayout.finishRefresh()
-        mIsError = false
-        mIsPullRefresh = false
-        heightCalculate()
-    }
-
-    override fun onPageError(stateCode: Int, error: String) {
-        mIsError = true
-        smartRefreshLayout.finishRefresh()
-    }
-
-    override fun onRefresh(refreshLayout: RefreshLayout) {
-        mIsPullRefresh = true
-        mWebView.reload()
-    }
 
     override fun onScrollChanged(newY: Int, oldY: Int) {
         LogUtils.i(TAG, "curY: $newY  oldY: $oldY")

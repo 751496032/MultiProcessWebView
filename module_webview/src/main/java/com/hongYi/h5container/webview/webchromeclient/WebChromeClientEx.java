@@ -1,5 +1,6 @@
 package com.hongYi.h5container.webview.webchromeclient;
 
+import com.google.gson.Gson;
 import com.hongYi.h5container.utils.LogUtils;
 import com.hongYi.h5container.webview.callback.WebViewCallback;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
@@ -15,6 +16,7 @@ public class WebChromeClientEx extends WebChromeClient {
 
 
     private WebViewCallback mWebViewCallback;
+
 
     public WebChromeClientEx() {
     }
@@ -60,5 +62,7 @@ public class WebChromeClientEx extends WebChromeClient {
         LogUtils.i("onConsole", consoleMessage.message());
         return super.onConsoleMessage(consoleMessage);
     }
+
+
 
 }

@@ -13,9 +13,9 @@ import kotlin.collections.emptyList as emptyList1
 class CommandHelper {
 
     companion object {
-        val SUCCESS_CALLBACK = "success"
-        val FAIL_CALLBACK = "fail"
-        val COMPLETE_CALLBACK = "complete"
+        const val SUCCESS_CALLBACK = "success"
+        const val FAIL_CALLBACK = "fail"
+        const val COMPLETE_CALLBACK = "complete"
 
         val INSTANCE by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             CommandHelper()

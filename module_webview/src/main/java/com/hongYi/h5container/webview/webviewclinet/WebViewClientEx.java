@@ -10,7 +10,6 @@ import com.hongYi.h5container.utils.LogUtils;
 import com.hongYi.h5container.webview.callback.WebViewCallback;
 import com.hongYi.h5container.webview.ssl.SslCallback;
 import com.hongYi.h5container.webview.ssl.SslManager;
-import com.hongYi.h5container.webview.webchromeclient.WebChromeClientEx;
 import com.tencent.smtt.export.external.interfaces.SslError;
 import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
 import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
@@ -64,14 +63,53 @@ public class WebViewClientEx extends WebViewClient {
      */
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest webResourceRequest) {
-        return override(webView, webView.getUrl());
+        String requestUrl = webResourceRequest.getUrl().toString();
+        LogUtils.i(TAG, "shouldOverrideUrlLoadingN  requestUrl: " + requestUrl);
+        LogUtils.i(TAG, "shouldOverrideUrlLoadingN originalUrl: " + webView.getOriginalUrl());
+        return interceptUrlLoading(webView, requestUrl, webResourceRequest);
     }
 
-    private boolean override(WebView webView, String url) {
-        LogUtils.i(TAG, url);
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView webView, String requestUrl) {
+        LogUtils.i(TAG, "shouldOverrideUrlLoading   requestUrl: " + requestUrl);
+        LogUtils.i(TAG, "shouldOverrideUrlLoading  originalUrl: " + webView.getOriginalUrl());
+
+        return interceptUrlLoading(webView, requestUrl, new WebResourceRequestImpl(requestUrl));
+    }
+
+    private boolean mIsPageLoading = false;
+
+    /**
+     * 加载网页正常流程是 onPageStarted -> onPageFinished
+     * 如果发生了重定向，shouldOverrideUrlLoading会在onPageFinished之前触发，同时onPageStarted会调用多次，如下：
+     * onPageStarted... -> shouldOverrideUrlLoading -> onPageFinished
+     * @param webView
+     * @param url
+     * @param webResourceRequest
+     * @return
+     */
+    private boolean interceptUrlLoading(WebView webView, String url, WebResourceRequest webResourceRequest) {
+        // 处理重定向
+        if (mIsPageLoading) {
+            WebResourceRequestImpl request = null;
+            if (webResourceRequest instanceof WebResourceRequestImpl){
+                // 这里是兼容Android N以下低版本
+                request = (WebResourceRequestImpl) webResourceRequest;
+            }else {
+                // 将X5内核的WebResourceRequest转换成自定义的对象
+                LogUtils.i(TAG, "interceptUrlLoadingX5  isRedirect: " + webResourceRequest.isRedirect());
+                request = new WebResourceRequestImpl(webResourceRequest);
+            }
+            request.setRedirect(true);
+            webResourceRequest = request;
+        }
+        LogUtils.i(TAG, "interceptUrlLoading  isRedirect: " + webResourceRequest.isRedirect());
+        LogUtils.i(TAG, "interceptUrlLoading  mIsPageLoading: " + mIsPageLoading);
         Context context = webView.getContext();
-        if (TextUtils.isEmpty(url) || url.startsWith("http://") ||
-                url.startsWith("https://") || url.startsWith("file://")) {
+        if (TextUtils.isEmpty(url) || url.startsWith("http") || url.startsWith("file://")) {
+            if (mWebViewCallback != null) {
+                return mWebViewCallback.onInterceptLoading(webResourceRequest, url);
+            }
             return false;
         } else {
             try {
@@ -109,6 +147,8 @@ public class WebViewClientEx extends WebViewClient {
     @Override
     public void onPageStarted(WebView webView, String url, Bitmap bitmap) {
         super.onPageStarted(webView, url, bitmap);
+        LogUtils.i(TAG, "onPageStarted");
+        mIsPageLoading = true;
         if (mIsCanClearHistory) {
             webView.clearHistory();
             mIsCanClearHistory = false;
@@ -127,12 +167,15 @@ public class WebViewClientEx extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
+        LogUtils.i(TAG, "onPageFinished");
+        mIsPageLoading = false;
         if (mWebViewCallback != null) mWebViewCallback.onPageFinished();
     }
 
     @Override
     public void onPageCommitVisible(WebView webView, String url) {
         super.onPageCommitVisible(webView, url);
+        LogUtils.i(TAG, "onPageCommitVisible");
     }
 
     /**

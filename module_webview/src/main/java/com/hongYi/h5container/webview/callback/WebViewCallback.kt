@@ -1,5 +1,7 @@
 package com.hongYi.h5container.webview.callback
 
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest
+
 /**
  *@author: HZWei
  *@date:  2021/8/2
@@ -31,4 +33,11 @@ interface WebViewCallback {
      * 网页加载错误
      */
     fun onPageError(stateCode: Int, error: String)
+
+
+    /**
+     * 返回true，会拦截url加载，需要自定义加载逻辑
+     * @see com.hongYi.h5container.webview.webviewclinet.WebViewClientEx#shouldOverrideUrlLoading()
+     */
+    fun onInterceptLoading(webResourceRequest: WebResourceRequest,requestUrl: String):Boolean
 }
