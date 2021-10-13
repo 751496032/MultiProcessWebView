@@ -148,7 +148,8 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         if (bytesCopied > 0) {
             String fileName = new File(mUrl.getFile()).getName();
             try {
-                UnZipFolderUtils.unZipFolder(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH);
+                long fileSize = UnZipFolderUtils.unzip(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH);
+                Log.d(TAG, String.valueOf(fileSize));
             } catch (Exception e) {
                 e.printStackTrace();
             }
