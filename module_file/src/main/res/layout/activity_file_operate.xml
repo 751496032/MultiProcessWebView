@@ -6,11 +6,11 @@
     android:padding="30dp">
 
     <Button
-        android:id="@+id/save_file"
+        android:id="@+id/download_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
-        android:text="压缩文件zip下载" />
+        android:text="压缩文件zip下载成功后自动解压" />
 
 
     <Button
@@ -18,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
-        android:text="解压文件zip" />
+        android:text="解压文件zip"
+        android:visibility="gone" />
 
 
     <Button
@@ -26,7 +27,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
-        android:text="文件是否存在" />
+        android:text="文件是否存在"
+        android:visibility="gone" />
 
 
     <Button

@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.hongYi.h5container.business.utils.FileUtil;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,8 +35,8 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 
     public ZipExtractorTask(String in, String out, Context context, boolean replaceAll) {
         super();
-        mInput = new File(in);
-        mOutput = new File(out);
+        mInput = new File(FileUtil.getSDCardPath() + in);
+        mOutput = new File(FileUtil.getSDCardPath() + out);
         if (!mOutput.exists()) {
             if (!mOutput.mkdirs()) {
                 Log.e(TAG, "Failed to make directories:" + mOutput.getAbsolutePath());

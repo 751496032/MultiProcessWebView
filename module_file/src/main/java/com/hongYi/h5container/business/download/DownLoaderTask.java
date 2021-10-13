@@ -4,7 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.hongYi.h5container.business.utils.FileUtil;
+import com.hongYi.h5container.business.utils.Utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,8 +33,9 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
     private int mProgress = 0;
     private ProgressReportingOutputStream mOutputStream;
     private Context mContext;
+    private String FILE_NAME_PATH;
 
-    public DownLoaderTask(String url, String out, Context context) {
+    public DownLoaderTask(String url, String fileName, Context context) {
         super();
         if (context != null) {
             mDialog = new ProgressDialog(context);
@@ -40,10 +45,21 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         }
 
         try {
+            String out = FileUtil.getSDCardPath();
+            if (TextUtils.isEmpty(fileName)) {  //判断文件名是否为空，为空则默认一个
+                out = out + Utils.getAppName(context);
+            } else {
+                out = out + fileName;
+            }
+            FILE_NAME_PATH = out;
+            File srcDir = new File(out);
+            if (!srcDir.exists()) {     //判断该文件夹是否存在，不存在则创建
+                FileUtil.createFolder(FileUtil.getSDCardPath(), fileName);
+            }
             mUrl = new URL(url);
-            String fileName = new File(mUrl.getFile()).getName();
-            mFile = new File(out, fileName);
-            Log.d(TAG, "out=" + out + ", name=" + fileName + ",mUrl.getFile()=" + mUrl.getFile());
+            String fileName2 = new File(mUrl.getFile()).getName();
+            mFile = new File(out, fileName2);
+            Log.d(TAG, "out=" + out + ", name=" + fileName2 + ",mUrl.getFile()=" + mUrl.getFile());
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -127,6 +143,18 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+        if (bytesCopied > 0) {
+            String fileName = new File(mUrl.getFile()).getName();
+            try {
+                UnZipFolderUtils.unZipFolder(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            String fileName = new File(mUrl.getFile()).getName();
+//            ZipExtractorTask zipExtractorTask = new ZipExtractorTask(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH, mContext, true);
+//            zipExtractorTask.execute();
         }
         return bytesCopied;
     }
