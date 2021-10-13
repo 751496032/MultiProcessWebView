@@ -1,3 +1,4 @@
+include ':module_file'
 include ':module_webview'
 include ':app'
 rootProject.name = "AndroidH5Container"
