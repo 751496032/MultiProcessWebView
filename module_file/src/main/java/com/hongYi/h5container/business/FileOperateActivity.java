@@ -68,16 +68,16 @@ public class FileOperateActivity extends AppCompatActivity implements View.OnCli
                 Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
             }
         } else if (vid == R.id.is_file_exist) {
-            File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-sdk-main");
+            File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-jssdk-main");
             if (srcDir.exists()) {  //判断需要用到的文件是否存在
                 Toast.makeText(this, "文件存在", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
             }
         } else if (vid == R.id.index_exist) {
-            File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-sdk-main/test.html");
+            File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-jssdk-main/test.html");
             if (srcDir.exists()) {  //判断该网页文件是否存在
-                startActivity(WebViewActivity.class, "file://" + FileUtil.getSDCardPath() + "html/hYi-sdk-main/test.html", "测试网页");
+                startActivity(WebViewActivity.class, "file://" + FileUtil.getSDCardPath() + "html/hYi-jssdk-main/test.html", "测试网页");
             } else {
                 Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
             }
@@ -89,6 +89,7 @@ public class FileOperateActivity extends AppCompatActivity implements View.OnCli
         intent.putExtra(Constants.URL, url);
         intent.putExtra(Constants.TITLE, title);
         intent.putExtra(Constants.JS_OBJECT_NAME, "hYi");
+        intent.putExtra(Constants.CAN_NATIVE_REFRESH, false);
         startActivity(intent);
     }
 }
