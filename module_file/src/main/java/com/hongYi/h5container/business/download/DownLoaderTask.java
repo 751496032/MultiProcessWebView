@@ -26,20 +26,19 @@ import java.net.URLConnection;
  * Created by zhuangxiaozheng on 2021/10/9.
  */
 public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
-    private final static String TAG = "DownLoaderTask";
-    private static URL mUrl;
-    private static File mFile;
-    private static ProgressDialog mDialog;
+    private final String TAG = "DownLoaderTask";
+    private URL mUrl;
+    private File mFile;
+    private ProgressDialog mDialog;
     private int mProgress = 0;
     private ProgressReportingOutputStream mOutputStream;
-    private static Context mContext;
-    private static String FILE_NAME_PATH;
-    private static ZipFolderCallBack zipFolderCallBack;
-    private static DownloadFileCallBack downloadFileCallBack;
+    private String FILE_NAME_PATH;
+    private ZipFolderCallBack zipFolderCallBack;
+    private DownloadFileCallBack downloadFileCallBack;
 
     public static volatile DownLoaderTask instance;
 
-    public DownLoaderTask() {
+    private DownLoaderTask() {
 
     }
 
@@ -67,7 +66,6 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
     public DownLoaderTask downLoaderTaskFunction(String url, String fileName, Context context) {
         if (context != null) {
             mDialog = new ProgressDialog(context);
-            mContext = context;
         } else {
             mDialog = null;
         }
