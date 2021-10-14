@@ -59,19 +59,19 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        val command1 = CommandHelper.INSTANCE.getCommand<CommandUI>("updateui")
-        command1?.registerCommandMonitor(object : CommandMonitor{
-            override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
-
-            }
-
-        })
+//        val command1 = CommandHelper.INSTANCE.getCommand<CommandUI>("updateui")
+//        command1?.registerCommandMonitor(object : CommandMonitor{
+//            override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+//
+//            }
+//
+//        })
 
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        CommandHelper.INSTANCE.getCommand<CommandLogin>("login")?.unregisterCommandMonitor();
+//        CommandHelper.INSTANCE.getCommand<CommandLogin>("login")?.unregisterCommandMonitor();
     }
 }

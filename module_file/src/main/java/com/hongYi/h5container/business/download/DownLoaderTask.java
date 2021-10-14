@@ -34,8 +34,10 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
     private ProgressReportingOutputStream mOutputStream;
     private Context mContext;
     private String FILE_NAME_PATH;
+    ZipFolderCallBack zipFolderCallBack;
+    DownloadFileCallBack downloadFileCallBack;
 
-    public DownLoaderTask(String url, String fileName, Context context) {
+    public DownLoaderTask(String url, String fileName, Context context, DownloadFileCallBack downloadFileCallBack, ZipFolderCallBack zipFolderCallBack) {
         super();
         if (context != null) {
             mDialog = new ProgressDialog(context);
@@ -43,7 +45,8 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         } else {
             mDialog = null;
         }
-
+        this.zipFolderCallBack = zipFolderCallBack;
+        this.downloadFileCallBack = downloadFileCallBack;
         try {
             String out = FileUtil.getSDCardPath();
             if (TextUtils.isEmpty(fileName)) {  //判断文件名是否为空，为空则默认一个
@@ -146,16 +149,24 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         }
 
         if (bytesCopied > 0) {
+            downloadFileCallBack.downloadFileSuccess();
             String fileName = new File(mUrl.getFile()).getName();
             try {
                 long fileSize = UnZipFolderUtils.unzip(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH);
                 Log.d(TAG, String.valueOf(fileSize));
+                if (fileSize > 0) {
+                    zipFolderCallBack.unZipFolderSuccess();
+                } else {
+                    zipFolderCallBack.unZipFolderFail();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 //            String fileName = new File(mUrl.getFile()).getName();
 //            ZipExtractorTask zipExtractorTask = new ZipExtractorTask(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH, mContext, true);
 //            zipExtractorTask.execute();
+        } else {
+            downloadFileCallBack.downloadFileFail();
         }
         return bytesCopied;
     }
@@ -204,5 +215,17 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
             publishProgress(mProgress);
         }
 
+    }
+
+    public interface ZipFolderCallBack {
+        void unZipFolderSuccess();
+
+        void unZipFolderFail();
+    }
+
+    public interface DownloadFileCallBack {
+        void downloadFileSuccess();
+
+        void downloadFileFail();
     }
 }
