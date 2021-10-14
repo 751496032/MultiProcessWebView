@@ -1,4 +1,4 @@
-package com.hongYi.h5container.business;
+package com.hongYi.h5container;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,15 +28,15 @@ public class FileOperateActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_operate);
+        setContentView(com.hongYi.h5container.business.R.layout.activity_file_operate);
         initView();
     }
 
     private void initView() {
-        save_file = findViewById(R.id.save_file);
-        unZipFolder_file = findViewById(R.id.unZipFolder_file);
-        is_file_exist = findViewById(R.id.is_file_exist);
-        index_exist = findViewById(R.id.index_exist);
+        save_file = findViewById(com.hongYi.h5container.business.R.id.save_file);
+        unZipFolder_file = findViewById(com.hongYi.h5container.business.R.id.unZipFolder_file);
+        is_file_exist = findViewById(com.hongYi.h5container.business.R.id.is_file_exist);
+        index_exist = findViewById(com.hongYi.h5container.business.R.id.index_exist);
         index_exist.setOnClickListener(this);
         save_file.setOnClickListener(this);
         unZipFolder_file.setOnClickListener(this);
@@ -48,14 +48,14 @@ public class FileOperateActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         int vid = v.getId();
-        if (vid == R.id.save_file) {
+        if (vid == com.hongYi.h5container.business.R.id.save_file) {
             File srcDir = new File(FileUtil.getSDCardPath() + "html");
             if (!srcDir.exists()) {     //判断该文件夹是否存在，不存在则创建
                 FileUtil.createFolder(FileUtil.getSDCardPath(), "html");
             }
             DownLoaderTask downLoaderTask = new DownLoaderTask(downloadUrl, FileUtil.getSDCardPath() + "html", v.getContext());
             downLoaderTask.execute();
-        } else if (vid == R.id.unZipFolder_file) {
+        } else if (vid == com.hongYi.h5container.business.R.id.unZipFolder_file) {
             File srcDir = new File(FileUtil.getSDCardPath() + "html/main.zip");
             if (srcDir.exists()) {  //判断该解压包文件是否存在
                 File srcDir2 = new File(FileUtil.getSDCardPath() + "html");
@@ -67,14 +67,14 @@ public class FileOperateActivity extends AppCompatActivity implements View.OnCli
             } else {
                 Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
             }
-        } else if (vid == R.id.is_file_exist) {
+        } else if (vid == com.hongYi.h5container.business.R.id.is_file_exist) {
             File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-jssdk-main");
             if (srcDir.exists()) {  //判断需要用到的文件是否存在
                 Toast.makeText(this, "文件存在", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
             }
-        } else if (vid == R.id.index_exist) {
+        } else if (vid == com.hongYi.h5container.business.R.id.index_exist) {
             File srcDir = new File(FileUtil.getSDCardPath() + "html/hYi-jssdk-main/test.html");
             if (srcDir.exists()) {  //判断该网页文件是否存在
                 startActivity(WebViewActivity.class, "file://" + FileUtil.getSDCardPath() + "html/hYi-jssdk-main/test.html", "测试网页");
