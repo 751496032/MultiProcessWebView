@@ -11,6 +11,7 @@ interface Command {
 
     fun commandName(): String
 
+    // parameters: js传过来的参数
     fun executeCommand(parameters: Map<*,*>, webInterface: ICallbackFromMainToWebInterface)
 
 

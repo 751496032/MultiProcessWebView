@@ -7,8 +7,12 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.hongYi.h5container.business.FileOperateActivity
+import com.hongYi.h5container.command.CommandHelper
+import com.hongYi.h5container.command.CommandMonitor
+import com.hongYi.h5container.commands.CommandLogin
+import com.hongYi.h5container.commands.CommandUI
 import com.hongYi.h5container.ui.WebViewActivity
 import com.hongYi.h5container.utils.Constants
 
@@ -41,5 +45,33 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(Constants.JS_OBJECT_NAME, "hYi")
         intent.putExtra(Constants.CAN_NATIVE_REFRESH, false)
         startActivity(intent)
+
+
+
+        // 外部调用案例
+        val command = CommandHelper.INSTANCE.getCommand<CommandLogin>("login")
+        command?.registerCommandMonitor(object : CommandMonitor {
+            override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+                Toast.makeText(App.INSTANCE, "登录中...", Toast.LENGTH_LONG).show()
+
+
+            }
+
+        })
+
+        val command1 = CommandHelper.INSTANCE.getCommand<CommandUI>("updateui")
+        command1?.registerCommandMonitor(object : CommandMonitor{
+            override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+
+            }
+
+        })
+
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        CommandHelper.INSTANCE.getCommand<CommandLogin>("login")?.unregisterCommandMonitor();
     }
 }

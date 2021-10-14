@@ -1,6 +1,8 @@
 package com.hongYi.h5container.command
 
 import com.hongYi.h5container.ICallbackFromMainToWebInterface
+import com.hongYi.h5container.main.MainCommandManager
+import java.lang.IllegalArgumentException
 import java.lang.annotation.Native
 import java.util.*
 import kotlin.collections.emptyList as emptyList1
@@ -45,15 +47,27 @@ class CommandHelper {
         return ""
     }
 
-
+    /**
+     * 执行成功调用
+     */
     fun handleSuccessCallback(parameterFromJs: Map<*, *>, parameterFormNative: String, webInterface: ICallbackFromMainToWebInterface) {
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK), parameterFormNative)
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK),"{}")
     }
 
+    /**
+     * 执行失败调用
+     */
     fun handleFailCallback(parameterFromJs: Map<*, *>, parameterFormNative: String, webInterface: ICallbackFromMainToWebInterface) {
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK), parameterFormNative)
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK),"{}")
+    }
+
+    /**
+     * 获取指令对象
+     */
+    fun <T : Command?> getCommand(commandName: String?): T? {
+       return MainCommandManager.INSTANCE.getCommand<T>(commandName)
     }
 
 }
