@@ -40,26 +40,28 @@ class FileOperateActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         val vid = v.id
         if (vid == R.id.download_file) {
-            val downLoaderTask = DownLoaderTask(downloadUrl, fileName, v.context,
-                    object :DownLoaderTask.DownloadFileCallBack{
-                        override fun downloadFileSuccess() {
-                            Log.d(TAG,"下载成功")
+            DownLoaderTask.getInstance().downLoaderTaskFunction(downloadUrl, fileName, v.context)
+                    .setDownloadFileCallBackListener(object : DownLoaderTask.DownloadFileCallBack {
+                        override fun downloadFileSuccess(path: String?) {
+                            Log.d(TAG, "下载成功:路径——>$path")
                         }
 
                         override fun downloadFileFail() {
-                            Log.d(TAG,"下载失败")
+                            Log.d(TAG, "下载失败")
                         }
-                    },
-                    object :DownLoaderTask.ZipFolderCallBack{
-                        override fun unZipFolderSuccess() {
-                            Log.d(TAG,"解压成功")
+
+                    })
+                    .setZipFolderFileCallBackListener(object : DownLoaderTask.ZipFolderCallBack {
+                        override fun unZipFolderSuccess(path: String?) {
+                            Log.d(TAG, "解压成功:路径——>$path")
+//                            startActivity(WebViewActivity::class.java, "file://$path/hYi-jssdk-main/test.html", "测试网页")
                         }
 
                         override fun unZipFolderFail() {
-                            Log.d(TAG,"解压失败")
+                            Log.d(TAG, "解压失败")
                         }
-                    })
-            downLoaderTask.execute()
+
+                    }).execute()
         } else if (vid == R.id.index_exist) {
             startActivity(WebViewActivity::class.java, h5FileNamePath, "测试网页")
         }

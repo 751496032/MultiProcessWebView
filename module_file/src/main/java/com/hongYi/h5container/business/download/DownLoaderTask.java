@@ -26,27 +26,51 @@ import java.net.URLConnection;
  * Created by zhuangxiaozheng on 2021/10/9.
  */
 public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
-    private final String TAG = "DownLoaderTask";
-    private URL mUrl;
-    private File mFile;
-    private ProgressDialog mDialog;
+    private final static String TAG = "DownLoaderTask";
+    private static URL mUrl;
+    private static File mFile;
+    private static ProgressDialog mDialog;
     private int mProgress = 0;
     private ProgressReportingOutputStream mOutputStream;
-    private Context mContext;
-    private String FILE_NAME_PATH;
-    ZipFolderCallBack zipFolderCallBack;
-    DownloadFileCallBack downloadFileCallBack;
+    private static Context mContext;
+    private static String FILE_NAME_PATH;
+    private static ZipFolderCallBack zipFolderCallBack;
+    private static DownloadFileCallBack downloadFileCallBack;
 
-    public DownLoaderTask(String url, String fileName, Context context, DownloadFileCallBack downloadFileCallBack, ZipFolderCallBack zipFolderCallBack) {
-        super();
+    public static volatile DownLoaderTask instance;
+
+    public DownLoaderTask() {
+
+    }
+
+    public static DownLoaderTask getInstance() {
+        if (instance == null) {
+            synchronized (DownLoaderTask.class) {
+                if (instance == null) {
+                    instance = new DownLoaderTask();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public DownLoaderTask setDownloadFileCallBackListener(DownloadFileCallBack downloadFileCallBack1) {
+        downloadFileCallBack = downloadFileCallBack1;
+        return DownLoaderTask.this;
+    }
+
+    public DownLoaderTask setZipFolderFileCallBackListener(ZipFolderCallBack zipFolderCallBack1) {
+        zipFolderCallBack = zipFolderCallBack1;
+        return DownLoaderTask.this;
+    }
+
+    public DownLoaderTask downLoaderTaskFunction(String url, String fileName, Context context) {
         if (context != null) {
             mDialog = new ProgressDialog(context);
             mContext = context;
         } else {
             mDialog = null;
         }
-        this.zipFolderCallBack = zipFolderCallBack;
-        this.downloadFileCallBack = downloadFileCallBack;
         try {
             String out = FileUtil.getSDCardPath();
             if (TextUtils.isEmpty(fileName)) {  //判断文件名是否为空，为空则默认一个
@@ -67,7 +91,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        return DownLoaderTask.this;
     }
 
     @Override
@@ -149,13 +173,13 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
         }
 
         if (bytesCopied > 0) {
-            downloadFileCallBack.downloadFileSuccess();
+            downloadFileCallBack.downloadFileSuccess(FILE_NAME_PATH);
             String fileName = new File(mUrl.getFile()).getName();
             try {
                 long fileSize = UnZipFolderUtils.unzip(FILE_NAME_PATH + "/" + fileName, FILE_NAME_PATH);
                 Log.d(TAG, String.valueOf(fileSize));
                 if (fileSize > 0) {
-                    zipFolderCallBack.unZipFolderSuccess();
+                    zipFolderCallBack.unZipFolderSuccess(FILE_NAME_PATH);
                 } else {
                     zipFolderCallBack.unZipFolderFail();
                 }
@@ -218,13 +242,13 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
     }
 
     public interface ZipFolderCallBack {
-        void unZipFolderSuccess();
+        void unZipFolderSuccess(String path);
 
         void unZipFolderFail();
     }
 
     public interface DownloadFileCallBack {
-        void downloadFileSuccess();
+        void downloadFileSuccess(String path);
 
         void downloadFileFail();
     }
