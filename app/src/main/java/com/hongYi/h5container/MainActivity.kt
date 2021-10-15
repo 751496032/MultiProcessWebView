@@ -2,6 +2,7 @@ package com.hongYi.h5container
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
@@ -47,14 +48,16 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
 
-
         // 外部调用案例
         val command = CommandHelper.INSTANCE.getCommand<CommandLogin>("login")
         command?.registerCommandMonitor(object : CommandMonitor {
             override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
                 Toast.makeText(App.INSTANCE, "登录中...", Toast.LENGTH_LONG).show()
-
-
+//                parameters.entries.forEach {
+//                    Log.d("zxz", "key->" + it.key + "——————value->" + it.value)
+//                }
+//
+//                callback.handleWebCallback(parameters.keys.toString(),"")
             }
 
         })

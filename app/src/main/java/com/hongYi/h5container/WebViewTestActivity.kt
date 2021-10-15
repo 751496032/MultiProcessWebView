@@ -11,7 +11,7 @@ import com.hongYi.h5container.webview.webviewclinet.WebViewClientEx
  *@date:  2021/8/5
  *@desc:
  */
-public class WebViewTestActivity : AppCompatActivity() {
+class WebViewTestActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
