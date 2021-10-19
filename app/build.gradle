@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.hongYi.examples"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -37,11 +37,18 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(':module_webview')
     implementation project(':module_file')
+    implementation project(':module_function')
+    implementation project(':module_share2')
     implementation "androidx.core:core-ktx:1.1.16"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kapt 'com.google.auto.service:auto-service:1.0'
     implementation 'com.google.auto.service:auto-service:1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation 'com.ycjiang:ImagePreview:2.3.7'
+    //    扫描二维码
+    implementation 'com.github.yuzhiqiang1993:zxing:2.1.4'
+
 
 }
 repositories {

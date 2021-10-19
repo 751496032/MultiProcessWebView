@@ -1,8 +1,10 @@
-package com.hongYi.h5container
+package com.hongYi.h5container.activity
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
@@ -10,15 +12,21 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.hongYi.h5container.App
+import com.hongYi.h5container.ICallbackFromMainToWebInterface
+import com.hongYi.h5container.R
 import com.hongYi.h5container.command.CommandHelper
 import com.hongYi.h5container.command.CommandMonitor
 import com.hongYi.h5container.commands.CommandLogin
-import com.hongYi.h5container.commands.CommandUI
 import com.hongYi.h5container.ui.WebViewActivity
 import com.hongYi.h5container.utils.Constants
 
 class MainActivity : AppCompatActivity() {
-    var data = arrayOf("百度", "控价系统H5", "商城H5", "demo.html", "优化前WebView", "文件下载、解压、展示")
+
+    private val REQUEST_WRITE_STORAGE_PERMISSION = 101
+
+    var data = arrayOf("百度", "控价系统H5", "商城H5", "demo.html", "优化前WebView", "文件下载、解压、展示", "图片预览", "分享")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,6 +43,26 @@ class MainActivity : AppCompatActivity() {
                 3 -> startActivity(WebViewActivity::class.java, Constants.ANDROID_ASSET_URI + "demo.html", data[position])
                 4 -> startActivity(WebViewTestActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
                 5 -> startActivity(FileOperateActivity::class.java, "", "")
+                6 -> startActivity(TestFunctionActivity::class.java, "", "")
+                7 -> startActivity(ShareContentActivity::class.java, "", "")
+            }
+        }
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_STORAGE_PERMISSION)
+            } else {
+                Toast.makeText(this, "缺少文件读写权限，可能会造成无法分享文件", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_WRITE_STORAGE_PERMISSION) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "缺少文件读写权限，可能会造成无法分享文件", Toast.LENGTH_SHORT).show()
             }
         }
     }

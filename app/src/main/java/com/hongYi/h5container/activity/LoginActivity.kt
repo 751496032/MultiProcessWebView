@@ -1,4 +1,4 @@
-package com.hongYi.h5container
+package com.hongYi.h5container.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

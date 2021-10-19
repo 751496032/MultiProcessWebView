@@ -1,7 +1,8 @@
-package com.hongYi.h5container
+package com.hongYi.h5container.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.hongYi.h5container.R
 import com.hongYi.h5container.utils.Constants
 import com.hongYi.h5container.webview.X5WebView
 import com.hongYi.h5container.webview.webviewclinet.WebViewClientEx

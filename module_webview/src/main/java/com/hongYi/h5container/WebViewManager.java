@@ -119,7 +119,7 @@ public class WebViewManager {
         if (mWebView == null) throw new NullPointerException("WebView没有初始化");
         addToParentView(builder);
 
-        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速
+//        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速
 
         if (builder.mWebSettings != null) builder.mWebSettings.setSettings(mWebView);
         mWebView.setOnScrollChangedListener(builder.mScrollChangedListener);

@@ -1,3 +1,5 @@
+include ':module_share2'
+include ':module_function'
 include ':module_file'
 include ':module_webview'
 include ':app'

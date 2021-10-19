@@ -1,13 +1,17 @@
 package com.hongYi.h5container.ui
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.hongYi.h5container.R
 import com.hongYi.h5container.utils.Constants
-import com.hongYi.h5container.utils.LogUtils
+import com.hongYi.h5container.utils.ToolBarUtils
 import com.hongYi.h5container.webview.X5WebView
 import kotlinx.android.synthetic.main.activity_webview.*
 
@@ -25,11 +29,11 @@ class WebViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = resources.getColor(R.color.statusColor)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
         setContentView(R.layout.activity_webview)
-        supportActionBar?.hide()
+//        supportActionBar?.hide()
         val url = intent.getStringExtra(Constants.URL)
         val title = intent.getStringExtra(Constants.TITLE)
         val canNativeRefresh = intent.getBooleanExtra(Constants.CAN_NATIVE_REFRESH, true)
@@ -38,7 +42,9 @@ class WebViewActivity : AppCompatActivity() {
 
         toolbar.visibility = if (isShowActionBar) View.VISIBLE else View.GONE
         toolbar.navigationIcon = resources.getDrawable(R.mipmap.ic_left_arrow, null)
-        toolbar.title = title
+        toolbar.title = ""
+        toolbar_title.text = title
+        setSupportActionBar(toolbar)
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -51,6 +57,37 @@ class WebViewActivity : AppCompatActivity() {
 
 //       LogUtils.d( supportFragmentManager.findFragmentByTag(FRAGMENT_TAG).hashCode().toString() + FRAGMENT_TAG)
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_picture_preview -> {
+                Toast.makeText(this, "图片预览", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.action_picture_selector -> {
+                Toast.makeText(this, "图片选择器", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.action_scan -> {
+                Toast.makeText(this, "扫码", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.action_picture_share -> {
+                Toast.makeText(this, "分享", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.action_pay -> {
+                Toast.makeText(this, "支付", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 
 
@@ -71,7 +108,7 @@ class WebViewActivity : AppCompatActivity() {
 
 
     fun updateTitle(title: String) {
-        toolbar.title = title
+        toolbar_title.text = title
     }
 
     @Deprecated("过时")
