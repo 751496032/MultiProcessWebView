@@ -1,4 +1,4 @@
-include ':module_download'
+//include ':module_download'
 include ':module_webview'
 include ':app'
 rootProject.name = "AndroidH5Container"

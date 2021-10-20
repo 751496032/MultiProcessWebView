@@ -11,7 +11,6 @@ import com.hongYi.h5container.bean.JsParam;
 import com.hongYi.h5container.command.CommandHelper;
 import com.hongYi.h5container.main.MainCommandService;
 import com.hongYi.h5container.utils.LogUtils;
-import com.hongYi.h5container.utils.WebViewPool;
 import com.hongYi.h5container.webview.callback.WebViewLifecycleObserver;
 import com.hongYi.h5container.webview.settings.WebViewDefaultSettings;
 import com.tencent.smtt.sdk.ValueCallback;
