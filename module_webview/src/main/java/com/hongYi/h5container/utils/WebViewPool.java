@@ -13,6 +13,9 @@ import java.util.Stack;
  * date:  2021/1/28
  * desc:  建议在{@link android.app.Application#onCreate}中初始化，可能会影响启动速度，
  * 可使用{@link WebViewManager#init(Context)}进行初始化
+ *
+ * 另外一种预加载机制，使用LUR最大size是2，默认初始两个，每次使用取第一个，这样即可预初始化WebView，又能避免重复创建WebView。
+ *
  */
 public class WebViewPool {
 

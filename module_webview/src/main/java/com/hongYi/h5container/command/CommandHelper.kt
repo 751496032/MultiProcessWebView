@@ -1,7 +1,9 @@
 package com.hongYi.h5container.command
 
+import android.text.TextUtils
 import com.hongYi.h5container.ICallbackFromMainToWebInterface
 import com.hongYi.h5container.main.MainCommandManager
+import com.hongYi.h5container.webview.X5WebView
 import java.lang.IllegalArgumentException
 import java.lang.annotation.Native
 import java.util.*
@@ -61,6 +63,25 @@ class CommandHelper {
     fun handleFailCallback(parameterFromJs: Map<*, *>, parameterFormNative: String, webInterface: ICallbackFromMainToWebInterface) {
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK), parameterFormNative)
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK),"{}")
+    }
+
+
+    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webInterface: ICallbackFromMainToWebInterface){
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK)))
+        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK))
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK)))
+        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK))
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK)))
+        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK))
+    }
+
+    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webView: X5WebView){
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK)))
+            webView.unregisterJsCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK))
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK)))
+            webView.unregisterJsCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK))
+        if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK)))
+            webView.unregisterJsCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK))
     }
 
     /**

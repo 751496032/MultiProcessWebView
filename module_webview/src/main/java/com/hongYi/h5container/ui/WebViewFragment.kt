@@ -98,13 +98,13 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
     }
 
     private fun initWebView() {
-        mWebView = WebViewManager.with(mActivity)
-                .setViewContainer(webViewContainer)
-                .setJsObjectName(mJsName)
+        mWebView = WebViewManager.newBuilder(this)
+                .setRootView(webViewContainer)
+                .injectedJsObject(mJsName)
                 .setWebUrl(mUrl)
                 .setWebViewCallback(this)
-                .load()
-//        mWebView.injectJsCode()
+                .build()
+                .start()
 //        if (mActivity is WebViewActivity)
 //            (mActivity as WebViewActivity).setWebView(mWebView)
     }
@@ -155,7 +155,6 @@ class WebViewFragment : Fragment(), WebViewCallback, OnRefreshListener, X5WebVie
 
     private val mRequestCache = ArrayList<String>(8)
     override fun onInterceptLoading(webResourceRequest: WebResourceRequest, requestUrl: String): Boolean {
-
         if (webResourceRequest.isRedirect) {
             return false
         } else {

@@ -41,8 +41,13 @@ class WebViewCommandDispatcher private constructor() : ServiceConnection {
         //  接收到Js的通知后，Js向Native发送命令，执行Native操作
         mMainBinderInterface.handleWebCommand(commandName, params, object : ICallbackFromMainToWebInterface.Stub() { // Web进程的binder对象传到主进程中
             override fun handleWebCallback(jsCallbackName: String?, result: String?) {
-                // Native向Js发送命令，执行Js操作
-                webView.handleWebCallback(jsCallbackName, result)
+                // Native向Js发送命令，执行Js的回调
+                mWebView?.handleWebCallback(jsCallbackName, result)
+            }
+
+            override fun unregisterWebCallback(jsCallbackNameKey: String?) {
+                // Native向Js发送命令 取消Js回调函数，从对象中移除
+                mWebView?.unregisterJsCallback(jsCallbackNameKey)
             }
         })
 
@@ -50,7 +55,7 @@ class WebViewCommandDispatcher private constructor() : ServiceConnection {
 
     // 主进程服务已连接
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        // 如果要获取到主进程的Binder对象，实现IWebToMainInterface.Stub接口就是Binder对象
+        // 如果要获取到主进程的Binder对象，实现IWebToMainInterface.Stub代理接口
         mMainBinderInterface = IWebToMainInterface.Stub.asInterface(service)
     }
 

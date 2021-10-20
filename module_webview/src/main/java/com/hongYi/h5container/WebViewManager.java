@@ -3,10 +3,12 @@ package com.hongYi.h5container;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.text.TextUtils;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.hongYi.h5container.loadsir.CustomCallback;
 import com.hongYi.h5container.loadsir.EmptyCallback;
@@ -67,6 +69,7 @@ public class WebViewManager {
 
     /**
      * 默认在主进程初始化
+     *
      * @param context
      */
     public static void init(Context context) {
@@ -75,6 +78,7 @@ public class WebViewManager {
 
     /**
      * 初始化
+     *
      * @param context
      * @param mainProcessNeed false：在非主进程初始化
      */
@@ -117,16 +121,26 @@ public class WebViewManager {
 
         mWebView = WebViewPool.getInstance().getX5WebView(builder.mContext);
         if (mWebView == null) throw new NullPointerException("WebView没有初始化");
-        addToParentView(builder);
-
-        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速
-
+        attachView(builder);
+        addLifecycleObserver(builder);
+//        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速后可能会抖动
         if (builder.mWebSettings != null) builder.mWebSettings.setSettings(mWebView);
         mWebView.setOnScrollChangedListener(builder.mScrollChangedListener);
         mWebView.setWebViewClient(builder.mWebViewClient == null ? createDefWebViewClient(builder) : builder.mWebViewClient);
         mWebView.setWebChromeClient(builder.mWebChromeClient == null ? createDefWebChromeClient(builder) : builder.mWebChromeClient);
-        mWebView.registerJsInterface(builder.mJsObjectName);
-        loadUrl();
+        mWebView.registerJsInterface(builder.mJsObject);
+    }
+
+    private void addLifecycleObserver(Builder builder) {
+        if (builder.mCurrentFragment != null) {
+            builder.mCurrentFragment.getLifecycle().addObserver(mWebView);
+        }else {
+            if (builder.mContext instanceof FragmentActivity) {
+                AppCompatActivity activity = (AppCompatActivity) builder.mContext;
+                activity.getLifecycle().addObserver(mWebView);
+            }
+        }
+
     }
 
     private WebViewClientEx createDefWebViewClient(Builder builder) {
@@ -140,18 +154,18 @@ public class WebViewManager {
                 .setWebViewCallback(builder.mWebViewCallback);
     }
 
-    private void addToParentView(Builder builder) {
-        if (builder.mWebRootContainer != null) {
+    private void attachView(Builder builder) {
+        if (builder.mRootView != null) {
             if (builder.mLayoutParams != null) {
-                builder.mWebRootContainer.addView(mWebView, builder.mLayoutParams);
+                builder.mRootView.addView(mWebView, builder.mLayoutParams);
             } else {
                 ViewGroup parent = (ViewGroup) mWebView.getParent();
                 if (parent != null) parent.removeView(mWebView);
-                builder.mWebRootContainer.addView(mWebView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                builder.mRootView.addView(mWebView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
             }
         } else {
-            throw new NullPointerException("mWebRootContainer没有初始化，调用setViewContainer()方法初始化");
+            throw new NullPointerException("mRootView没有初始化，调用setRootView()方法初始化");
         }
     }
 
@@ -175,15 +189,25 @@ public class WebViewManager {
     }
 
 
-    public static Builder with(Context context) {
+    public static Builder newBuilder(Context context) {
         return new Builder(context);
+    }
+
+    public static Builder newBuilder(Fragment fragment) {
+        return new Builder(fragment);
+    }
+
+    public X5WebView start() {
+        loadUrl();
+        return mWebView;
     }
 
 
     public static class Builder {
 
         private Context mContext;
-        private ViewGroup mWebRootContainer;
+        private Fragment mCurrentFragment;
+        private ViewGroup mRootView;
         private ViewGroup.LayoutParams mLayoutParams;
         private IWebViewSettings mWebSettings;
 
@@ -215,11 +239,16 @@ public class WebViewManager {
         private String mSSLCertificateFileName;
         private X5WebView.OnScrollChangedListener mScrollChangedListener;
         private WebViewCallback mWebViewCallback;
-        private String mJsObjectName;
+        private String mJsObject;
 
 
         public Builder(Context context) {
             mContext = context;
+        }
+
+        public Builder(Fragment fragment) {
+            mCurrentFragment = fragment;
+            mContext = mCurrentFragment.getContext();
         }
 
         public Builder setWebSettings(@NonNull IWebViewSettings webSettings) {
@@ -238,13 +267,13 @@ public class WebViewManager {
             return this;
         }
 
-        public Builder setViewContainer(@NonNull ViewGroup container) {
-            mWebRootContainer = container;
+        public Builder setRootView(@NonNull ViewGroup container) {
+            mRootView = container;
             return this;
         }
 
-        public Builder setViewContainer(@NonNull ViewGroup container, ViewGroup.LayoutParams layoutParams) {
-            mWebRootContainer = container;
+        public Builder setRootView(@NonNull ViewGroup container, ViewGroup.LayoutParams layoutParams) {
+            mRootView = container;
             mLayoutParams = layoutParams;
             return this;
         }
@@ -280,13 +309,13 @@ public class WebViewManager {
             return this;
         }
 
-        public Builder setJsObjectName(String jsObjectName) {
-            mJsObjectName = jsObjectName;
+        public Builder injectedJsObject(String jsObject) {
+            mJsObject = jsObject;
             return this;
         }
 
-        public X5WebView load() {
-            return new WebViewManager(this).mWebView;
+        public WebViewManager build() {
+            return new WebViewManager(this);
         }
 
     }

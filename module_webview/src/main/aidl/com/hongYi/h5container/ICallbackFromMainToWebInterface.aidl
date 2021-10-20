@@ -12,4 +12,6 @@ interface ICallbackFromMainToWebInterface {
 //            double aDouble, String aString);
 
      void handleWebCallback(String jsCallbackNameKey, String result);
+
+     void unregisterWebCallback(String jsCallbackNameKey);
 }

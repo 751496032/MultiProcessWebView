@@ -4,20 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.JavascriptInterface;
 
 import com.google.gson.Gson;
 import com.hongYi.h5container.bean.JsParam;
+import com.hongYi.h5container.command.CommandHelper;
 import com.hongYi.h5container.main.MainCommandService;
 import com.hongYi.h5container.utils.LogUtils;
-import com.hongYi.h5container.utils.ViewHelper;
 import com.hongYi.h5container.utils.WebViewPool;
+import com.hongYi.h5container.webview.callback.WebViewLifecycleObserver;
 import com.hongYi.h5container.webview.settings.WebViewDefaultSettings;
 import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebView;
+
+import java.util.Map;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -26,13 +26,15 @@ import static android.content.Context.BIND_AUTO_CREATE;
  * date:  2021/1/19
  * desc:
  */
-public class X5WebView extends WebView {
+public class X5WebView extends WebView implements WebViewLifecycleObserver {
 
     public static final String TAG = "X5WebView";
 
     private OnScrollChangedListener mOnScrollChangedListener;
 
-    private String mJsObjectName;
+    private String mJsObject;
+
+    private boolean mIsDestroy;
 
     public X5WebView(Context context) {
         super(context);
@@ -65,7 +67,7 @@ public class X5WebView extends WebView {
 
     public void registerJsInterface(String name) {
         if (!TextUtils.isEmpty(name)) {
-            mJsObjectName = name;
+            mJsObject = name;
             addJavascriptInterface(this, name);
         }
     }
@@ -79,13 +81,17 @@ public class X5WebView extends WebView {
      */
     @JavascriptInterface
     public void takeNativeAction(String jsParam) {
-        LogUtils.i("takeNativeAction: " + jsParam);
+        LogUtils.i("takeNativeAction: " + jsParam +"  destroy: "+mIsDestroy);
         if (TextUtils.isEmpty(jsParam)) return;
         Gson gson = new Gson();
         JsParam jsParamObject = gson.fromJson(jsParam, JsParam.class);
         String params = gson.toJson(jsParamObject.param);
+        if (mIsDestroy){
+            Map map = gson.fromJson(params, Map.class);
+            CommandHelper.Companion.getINSTANCE().unregisterJsCallback(map,this);
+            return;
+        }
         WebViewCommandDispatcher.Companion.getINSTANCE().dispatcherCommand(jsParamObject.name, params, this);
-
     }
 
     @JavascriptInterface
@@ -102,11 +108,31 @@ public class X5WebView extends WebView {
     public void handleWebCallback(final String callbackNameKey, final String response) {
         LogUtils.i("handleWebCallback  callbackNameKey: " + callbackNameKey + "  response: " + response);
         if (TextUtils.isEmpty(callbackNameKey)) return;
+        String jscode = "javascript:window.nativetoJsCallback('" + callbackNameKey + "'," + response + ")";
+        LogUtils.i("jscode: " + jscode);
+        injectedCustomJscode(jscode);
+    }
+
+
+    /**
+     * 注销Js的回调函数
+     * @param callbackNameKey
+     */
+    public void  unregisterJsCallback(final String callbackNameKey){
+        LogUtils.i("unregisterJsCallback  callbackNameKey: " + callbackNameKey);
+        if (TextUtils.isEmpty(callbackNameKey)) return;
+        String jscode = "javascript:window.unregisterJsCallback('" + callbackNameKey + "')";
+        LogUtils.i("jscode: " + jscode);
+        injectedCustomJscode(jscode);
+    }
+
+
+    public void injectedCustomJscode(final String jscode) {
+        LogUtils.i("injectedCustomJscode  jscode: " +jscode);
+        if (TextUtils.isEmpty(jscode)) return;
         post(new Runnable() {
             @Override
             public void run() {
-                String jscode = "javascript:window.nativetoJsCallback('" + callbackNameKey + "'," + response + ")";
-                LogUtils.i("jscode: " + jscode);
                 evaluateJavascript(jscode, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String s) {
@@ -118,22 +144,11 @@ public class X5WebView extends WebView {
     }
 
 
-    public void injectJsCode(final String jscode) {
-        LogUtils.i("injectJsCode  jscode: " +jscode);
-        if (TextUtils.isEmpty(jscode)) return;
-        post(new Runnable() {
-            @Override
-            public void run() {
-                loadUrl(jscode);
-            }
-        });
-    }
-
-
-    public void injectJsCode(){
+    @Deprecated
+    public void injectedCustomJscode(){
         String js="javascript:(function(){" +
                 "document.documentElement.style.overflow='visible';})()";
-        injectJsCode(js);
+        injectedCustomJscode(js);
     }
 
 
@@ -141,11 +156,12 @@ public class X5WebView extends WebView {
     @Override
     public void destroy() {
         stopLoading();
-        if (!TextUtils.isEmpty(mJsObjectName)) removeJavascriptInterface(mJsObjectName);
-        boolean empty = WebViewPool.getInstance().isEmpty();
-        if (empty) {
-            super.destroy();
-        }
+        if (!TextUtils.isEmpty(mJsObject)) removeJavascriptInterface(mJsObject);
+        super.destroy();
+//        boolean empty = WebViewPool.getInstance().isEmpty();
+//        if (empty) {
+//            super.destroy();
+//        }
 
     }
 
@@ -163,6 +179,26 @@ public class X5WebView extends WebView {
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
+    @Override
+    public void onStart() {
+        LogUtils.i("WebView Lifecycle: onStart");
+        mIsDestroy = false;
+    }
+
+    @Override
+    public void onStop() {
+        LogUtils.i("WebView Lifecycle: onStop");
+    }
+
+    @Override
+    public void onDestroy() {
+        LogUtils.i("WebView Lifecycle: onDestroy");
+        mIsDestroy = true;
+    }
+
+    public boolean isDestroy() {
+        return mIsDestroy;
+    }
 
     public interface OnScrollChangedListener {
         void onScrollChanged(int newY, int oldY);
