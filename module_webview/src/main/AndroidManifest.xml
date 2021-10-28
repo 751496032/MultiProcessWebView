@@ -15,12 +15,15 @@
             android:label="dexopt"
             android:process=":dexopt" />
 
+<!--        <activity-->
+<!--            android:name=".ui.WebViewActivity$Small1"-->
+<!--            android:process=":webview"-->
+<!--            android:launchMode="standard"-->
+<!--            android:taskAffinity=".Small1" />-->
+
         <activity
-            android:name=".ui.WebViewActivity$Small0"
-            android:process=":webview"
-            android:launchMode="standard"
-            android:taskAffinity=".Small0"
-            tools:ignore="Instantiatable" />
+            android:name=".ui.WebViewActivity"
+            android:process=":webview" />
 
         <service android:name=".main.MainCommandService" />
 
