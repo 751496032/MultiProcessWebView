@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.hongYi.h5container">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -15,8 +16,12 @@
             android:process=":dexopt" />
 
         <activity
-            android:name=".ui.WebViewActivity"
-            android:process=":webview" />
+            android:name=".ui.WebViewActivity$Small0"
+            android:process=":webview"
+            android:launchMode="standard"
+            android:taskAffinity=".Small0"
+            tools:ignore="Instantiatable" />
+
         <service android:name=".main.MainCommandService" />
 
 

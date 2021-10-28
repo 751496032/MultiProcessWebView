@@ -1,6 +1,7 @@
 package com.hongYi.h5container.ui
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -16,14 +17,20 @@ import kotlinx.android.synthetic.main.activity_webview.*
  *date:  2021/1/20
  *desc:
  */
-class WebViewActivity : AppCompatActivity() {
+open class WebViewActivity : AppCompatActivity() {
 
     private lateinit var mX5WebView: X5WebView
     private val FRAGMENT_TAG = "web_fragment"
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    inner class Small1 : WebViewActivity(){}
+    inner class Small2 : WebViewActivity(){}
+    inner class Small3 : WebViewActivity(){}
+    inner class Small4 : WebViewActivity(){}
+    inner class Small5 : WebViewActivity(){}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTaskDescription(ActivityManager.TaskDescription())
         window.statusBarColor = resources.getColor(R.color.statusColor)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR

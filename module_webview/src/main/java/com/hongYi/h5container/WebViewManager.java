@@ -18,6 +18,8 @@ import com.hongYi.h5container.loadsir.TimeoutCallback;
 import com.hongYi.h5container.utils.LogUtils;
 import com.hongYi.h5container.webview.X5WebView;
 import com.hongYi.h5container.webview.callback.WebViewCallback;
+import com.hongYi.h5container.webview.callback.WebViewLifecycleListener;
+import com.hongYi.h5container.webview.callback.WebViewLifecycleObserver;
 import com.hongYi.h5container.webview.settings.IWebViewSettings;
 import com.hongYi.h5container.utils.WebViewPool;
 import com.hongYi.h5container.webview.webchromeclient.WebChromeClientEx;
@@ -126,6 +128,7 @@ public class WebViewManager {
 //        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); // 开启硬件加速后可能会抖动
         if (builder.mWebSettings != null) builder.mWebSettings.setSettings(mWebView);
         mWebView.setOnScrollChangedListener(builder.mScrollChangedListener);
+        mWebView.setWebViewLifecycleListener(builder.mLifecycleListener);
         mWebView.setWebViewClient(builder.mWebViewClient == null ? createDefWebViewClient(builder) : builder.mWebViewClient);
         mWebView.setWebChromeClient(builder.mWebChromeClient == null ? createDefWebChromeClient(builder) : builder.mWebChromeClient);
         mWebView.registerJsInterface(builder.mJsObject);
@@ -134,7 +137,7 @@ public class WebViewManager {
     private void addLifecycleObserver(Builder builder) {
         if (builder.mCurrentFragment != null) {
             builder.mCurrentFragment.getLifecycle().addObserver(mWebView);
-        }else {
+        } else {
             if (builder.mContext instanceof FragmentActivity) {
                 AppCompatActivity activity = (AppCompatActivity) builder.mContext;
                 activity.getLifecycle().addObserver(mWebView);
@@ -239,6 +242,7 @@ public class WebViewManager {
         private String mSSLCertificateFileName;
         private X5WebView.OnScrollChangedListener mScrollChangedListener;
         private WebViewCallback mWebViewCallback;
+        private WebViewLifecycleListener mLifecycleListener;
         private String mJsObject;
 
 
@@ -306,6 +310,11 @@ public class WebViewManager {
 
         public Builder setWebViewCallback(WebViewCallback webViewCallback) {
             mWebViewCallback = webViewCallback;
+            return this;
+        }
+
+        public Builder setWebViewLifecycleListener(WebViewLifecycleListener lifecycleListener) {
+            mLifecycleListener = lifecycleListener;
             return this;
         }
 
