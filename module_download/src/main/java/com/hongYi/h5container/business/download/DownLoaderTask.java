@@ -38,7 +38,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 
     public static volatile DownLoaderTask instance;
 
-    private DownLoaderTask() {
+    public DownLoaderTask() {
 
     }
 
@@ -100,6 +100,8 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
             mDialog.setTitle("Downloading...");
             mDialog.setMessage(mFile.getName());
             mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mDialog.setCancelable(false);
+            mDialog.setCanceledOnTouchOutside(false);
             mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
                 @Override

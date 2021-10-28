@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_picture_preview"
+        android:title="图片预览"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_picture_selector"
+        android:title="图片选择器"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_scan"
+        android:title="扫码"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_picture_share"
+        android:title="分享"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_pay"
+        android:title="支付"
+        app:showAsAction="never" />
+</menu>

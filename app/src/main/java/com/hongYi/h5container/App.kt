@@ -1,6 +1,8 @@
 package com.hongYi.h5container
 
 import android.app.Application
+import com.hongYi.h5container.business.ImageLoader
+import com.previewlibrary.ZoomMediaLoader
 
 /**
  * author:HZWei
@@ -11,7 +13,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         INSTANCE = this
-        WebViewManager.init(this,false)
+        WebViewManager.init(this, false)
+        ZoomMediaLoader.getInstance().init(ImageLoader())
+
     }
 
     companion object {

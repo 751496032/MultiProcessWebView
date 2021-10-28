@@ -1,4 +1,4 @@
-package com.hongYi.h5container
+package com.hongYi.h5container.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.hongYi.h5container.R
 import com.hongYi.h5container.business.download.DownLoaderTask
 import com.hongYi.h5container.business.utils.FileUtil
 import com.hongYi.h5container.business.utils.Utils
@@ -40,7 +41,7 @@ class FileOperateActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         val vid = v.id
         if (vid == R.id.download_file) {
-            DownLoaderTask.getInstance().downLoaderTaskFunction(downloadUrl, fileName, v.context)
+            val downLoaderTask = DownLoaderTask().downLoaderTaskFunction(downloadUrl, fileName, v.context)
                     .setDownloadFileCallBackListener(object : DownLoaderTask.DownloadFileCallBack {
                         override fun downloadFileSuccess(path: String?) {
                             Log.d(TAG, "下载成功:路径——>$path")
@@ -61,7 +62,8 @@ class FileOperateActivity : AppCompatActivity(), View.OnClickListener {
                             Log.d(TAG, "解压失败")
                         }
 
-                    }).execute()
+                    })
+            downLoaderTask.execute()
         } else if (vid == R.id.index_exist) {
             startActivity(WebViewActivity::class.java, h5FileNamePath, "测试网页")
         }

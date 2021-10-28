@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hongYi.h5container">
 
+    <!--  二维码-->
+    <uses-permission android:name="Manifest.permission.CAMERA" />
+    <uses-permission android:name="Manifest.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -11,15 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebViewTestActivity" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".activity.WebViewTestActivity" />
+        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.TestFunctionActivity" />
+        <activity android:name=".activity.ShareContentActivity" />
     </application>
 
 </manifest>

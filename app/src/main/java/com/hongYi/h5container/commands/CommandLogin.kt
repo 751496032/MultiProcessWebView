@@ -21,6 +21,8 @@ class CommandLogin : BaseCommand() {
 
     override fun execCommand(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
         val map = HashMap<String, String>()
+
+        val num = parameters["count"]
         map["accountName"] = "张三"
         CommandHelper.INSTANCE.handleSuccessCallback(parameters, Gson().toJson(map), callback)
     }
