@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+<!--    <uses-sdk-->
+<!--        android:minSdkVersion="21"-->
+<!--        android:targetSdkVersion="30"-->
+<!--        tools:overrideLibrary="com.hongYi.h5container"/>-->
+
 
     <application>
         <service
@@ -15,15 +20,35 @@
             android:label="dexopt"
             android:process=":dexopt" />
 
-<!--        <activity-->
-<!--            android:name=".ui.WebViewActivity$Small1"-->
-<!--            android:process=":webview"-->
-<!--            android:launchMode="standard"-->
-<!--            android:taskAffinity=".Small1" />-->
+        <activity
+            android:name=".ui.WebViewActivity$Small1"
+            android:process=":app_small1"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small1" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small2"
+            android:process=":app_small2"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small2" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small3"
+            android:process=":app_small3"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small3" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small4"
+            android:process=":app_small4"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small4" />
 
         <activity
             android:name=".ui.WebViewActivity"
-            android:process=":webview" />
+            android:process=":webview"
+            android:launchMode="singleTask"
+            android:taskAffinity=".webview" />
 
         <service android:name=".main.MainCommandService" />
 

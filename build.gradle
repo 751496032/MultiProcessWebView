@@ -7,6 +7,9 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url =  uri("https://maven.pkg.github.com/GCX-HCI/tray")
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.1"
@@ -24,6 +27,9 @@ allprojects {
         jcenter()
         maven {
             url "https://jitpack.io"
+        }
+        maven {
+           url =  uri("https://maven.pkg.github.com/GCX-HCI/tray")
         }
     }
 }

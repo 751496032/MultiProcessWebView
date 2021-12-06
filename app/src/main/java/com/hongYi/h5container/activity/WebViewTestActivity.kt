@@ -3,6 +3,7 @@ package com.hongYi.h5container.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.hongYi.h5container.R
+import com.hongYi.h5container.utils.ActivityHelper
 import com.hongYi.h5container.utils.Constants
 import com.hongYi.h5container.webview.X5WebView
 import com.hongYi.h5container.webview.webviewclinet.WebViewClientEx
@@ -23,5 +24,10 @@ class WebViewTestActivity : AppCompatActivity() {
         webView.loadUrl(intent.getStringExtra(Constants.URL))
 
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ActivityHelper.INSTANCE.printProcess(this)
     }
 }

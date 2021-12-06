@@ -30,6 +30,8 @@ import com.tencent.smtt.sdk.QbSdk;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import net.grandcentrix.tray.AppPreferences;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +71,8 @@ public class WebViewManager {
 
     }
 
+    private static AppPreferences mAppPreferences;
+
     /**
      * 默认在主进程初始化
      *
@@ -86,9 +90,14 @@ public class WebViewManager {
      */
     public static void init(Context context, boolean mainProcessNeed) {
         String processName = getProcessName(context);
-        String packageName = context.getApplicationContext().getPackageName();
-        if (!mainProcessNeed && TextUtils.equals(processName, packageName))
+        String mainProcessName = context.getApplicationContext().getPackageName();
+
+        LogUtils.i(TAG, "cur processName: " + processName
+                + " mainProcessName: " + mainProcessName);
+        // 主进程默认不初始化
+        if (!mainProcessNeed && TextUtils.equals(processName, mainProcessName))
             return;
+
         init();
         WebViewPool.getInstance().prepare(context);
         LogUtils.i(TAG, "init ProcessName : " + processName
@@ -97,23 +106,39 @@ public class WebViewManager {
 
 
     public static String getProcessName(Context cxt) {
-        int pid = android.os.Process.myPid();
+        initAppPreferences(cxt);
+
+        int curProcessPid = android.os.Process.myPid();
+        LogUtils.i(TAG, "curProcessPid: " + curProcessPid);
         ActivityManager am = (ActivityManager) cxt.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
         if (runningApps == null) {
             return null;
         }
+        String mainProcessName = cxt.getApplicationContext().getPackageName();
+        String targetProcess = null;
         for (ActivityManager.RunningAppProcessInfo procInfo : runningApps) {
-            if (procInfo.pid == pid) {
-                return procInfo.processName;
+            LogUtils.i(TAG, "processName: " + procInfo.processName + "  pid: " + procInfo.pid);
+            if (!TextUtils.equals(mainProcessName, procInfo.processName)) {
+                mAppPreferences.put(procInfo.processName, procInfo.pid);
+            }
+            if (procInfo.pid == curProcessPid) {
+                targetProcess = procInfo.processName;
             }
         }
-        return null;
+        return targetProcess;
+    }
+
+    private static void initAppPreferences(Context cxt) {
+        if (mAppPreferences == null) {
+            mAppPreferences = new AppPreferences(cxt);
+        }
+        mAppPreferences.clear();
     }
 
 
     private WebViewManager() {
-        //禁止外部初始化H5Container类
+        //禁止外部初始化WebViewManager类
     }
 
     private WebViewManager(Builder builder) {

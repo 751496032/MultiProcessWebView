@@ -19,8 +19,12 @@ class CommandOpenPage : Command {
     }
 
     override fun executeCommand(parameters: Map<*, *>, webInterface: ICallbackFromMainToWebInterface) {
+        var targetClass = ""
+        if (parameters["target_class"].toString().contains("WebViewTestActivity")){
+            targetClass = "com.hongYi.h5container.activity.WebViewTestActivity"
+        }
         val intent = Intent()
-        intent.setClassName(App.INSTANCE.packageName, parameters["target_class"].toString())
+        intent.setClassName(App.INSTANCE.packageName, targetClass)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         intent.putExtra(Constants.URL,"http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1")
         App.INSTANCE.startActivity(intent)

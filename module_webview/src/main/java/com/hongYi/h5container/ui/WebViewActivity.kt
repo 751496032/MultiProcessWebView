@@ -1,6 +1,5 @@
 package com.hongYi.h5container.ui
 
-import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.os.Build
 import android.os.Bundle
@@ -9,10 +8,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.hongYi.h5container.R
+import com.hongYi.h5container.utils.ActivityHelper
 import com.hongYi.h5container.utils.Constants
-import com.hongYi.h5container.utils.ToolBarUtils
 import com.hongYi.h5container.webview.X5WebView
 import kotlinx.android.synthetic.main.activity_webview.*
 
@@ -26,27 +27,56 @@ open class WebViewActivity : AppCompatActivity() {
     private lateinit var mX5WebView: X5WebView
     private val FRAGMENT_TAG = "web_fragment"
 
-    inner class Small1 : WebViewActivity(){}
-    inner class Small2 : WebViewActivity(){}
-    inner class Small3 : WebViewActivity(){}
-    inner class Small4 : WebViewActivity(){}
-    inner class Small5 : WebViewActivity(){}
+    // 用于处理多任务
+    open class Small1 : WebViewActivity() {}
+    open class Small2 : WebViewActivity() {}
+    open class Small3 : WebViewActivity() {}
+    open class Small4 : WebViewActivity() {}
+
+    private var url = ""
+    private var title = ""
+    private var jsObjectName = ""
+    private var canNativeRefresh = true
+    private var isShowActionBar = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTaskDescription(ActivityManager.TaskDescription())
         window.statusBarColor = resources.getColor(R.color.statusColor)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
-        setContentView(R.layout.activity_webview)
+        setContentView(getLayoutRes())
 //        supportActionBar?.hide()
-        val url = intent.getStringExtra(Constants.URL)
-        val title = intent.getStringExtra(Constants.TITLE)
-        val canNativeRefresh = intent.getBooleanExtra(Constants.CAN_NATIVE_REFRESH, true)
-        val isShowActionBar = intent.getBooleanExtra(Constants.IS_SHOW_ACTION_BAR, true)
-        val jsObjectName = intent.getStringExtra(Constants.JS_OBJECT_NAME)
+        initTaskDescription()
 
+        intentParamsGet()
+
+        initToolbar(toolbar)
+
+        commitWebViewFragment()
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ActivityHelper.INSTANCE.printProcess(this)
+    }
+
+
+    private fun initTaskDescription() {
+        val description = ActivityManager.TaskDescription()
+        setTaskDescription(description)
+    }
+
+
+
+    @LayoutRes
+    fun getLayoutRes(): Int {
+        return R.layout.activity_webview
+    }
+
+    fun initToolbar(toolbar: Toolbar) {
         toolbar.visibility = if (isShowActionBar) View.VISIBLE else View.GONE
         toolbar.navigationIcon = resources.getDrawable(R.mipmap.ic_left_arrow, null)
         toolbar.title = ""
@@ -55,15 +85,25 @@ open class WebViewActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+    }
 
-        val fragment = WebViewFragment.newInstance(url!!, canNativeRefresh, jsObjectName!!)
+    fun intentParamsGet() {
+        url = intent.getStringExtra(Constants.URL).toString()
+        title = intent.getStringExtra(Constants.TITLE).toString()
+        canNativeRefresh = intent.getBooleanExtra(Constants.CAN_NATIVE_REFRESH, true)
+        isShowActionBar = intent.getBooleanExtra(Constants.IS_SHOW_ACTION_BAR, true)
+        jsObjectName = intent.getStringExtra(Constants.JS_OBJECT_NAME).toString()
+    }
+
+
+    private fun commitWebViewFragment() {
+        val fragment = WebViewFragment.newInstance(url, canNativeRefresh, jsObjectName)
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragment_web_view, fragment, FRAGMENT_TAG)
                 .commitAllowingStateLoss()
 
-//       LogUtils.d( supportFragmentManager.findFragmentByTag(FRAGMENT_TAG).hashCode().toString() + FRAGMENT_TAG)
-
+        supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
