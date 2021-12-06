@@ -7,6 +7,8 @@ import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebView;
 
+import net.grandcentrix.tray.AppPreferences;
+
 /**
  * author:HZWei
  * date:  2021/1/20
@@ -19,6 +21,7 @@ public class WebChromeClientEx extends WebChromeClient {
 
 
     public WebChromeClientEx() {
+
     }
 
     public WebChromeClientEx setWebViewCallback(WebViewCallback webViewCallback) {

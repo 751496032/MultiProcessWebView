@@ -17,9 +17,9 @@ import kotlin.collections.emptyList as emptyList1
 class CommandHelper {
 
     companion object {
-        const val SUCCESS_CALLBACK = "success"
-        const val FAIL_CALLBACK = "fail"
-        const val COMPLETE_CALLBACK = "complete"
+        private const val SUCCESS_CALLBACK = "success"
+        private const val FAIL_CALLBACK = "fail"
+        private const val COMPLETE_CALLBACK = "complete"
 
         val INSTANCE by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             CommandHelper()
@@ -54,7 +54,7 @@ class CommandHelper {
      */
     fun handleSuccessCallback(parameterFromJs: Map<*, *>, parameterFormNative: String, webInterface: ICallbackFromMainToWebInterface) {
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK), parameterFormNative)
-        webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK),"{}")
+        webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK), "{}")
     }
 
     /**
@@ -62,20 +62,20 @@ class CommandHelper {
      */
     fun handleFailCallback(parameterFromJs: Map<*, *>, parameterFormNative: String, webInterface: ICallbackFromMainToWebInterface) {
         webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK), parameterFormNative)
-        webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK),"{}")
+        webInterface.handleWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK), "{}")
     }
 
 
-    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webInterface: ICallbackFromMainToWebInterface){
+    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webInterface: ICallbackFromMainToWebInterface) {
         if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK)))
-        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK))
+            webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK))
         if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK)))
-        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK))
+            webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK))
         if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK)))
-        webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK))
+            webInterface.unregisterWebCallback(getJsCallbackKey(parameterFromJs, COMPLETE_CALLBACK))
     }
 
-    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webView: X5WebView){
+    fun unregisterJsCallback(parameterFromJs: Map<*, *>, webView: X5WebView) {
         if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK)))
             webView.unregisterJsCallback(getJsCallbackKey(parameterFromJs, SUCCESS_CALLBACK))
         if (!TextUtils.isEmpty(getJsCallbackKey(parameterFromJs, FAIL_CALLBACK)))
@@ -88,7 +88,7 @@ class CommandHelper {
      * 获取指令对象
      */
     fun <T : Command?> getCommand(commandName: String?): T? {
-       return MainCommandManager.INSTANCE.getCommand<T>(commandName)
+        return MainCommandManager.INSTANCE.getCommand<T>(commandName)
     }
 
 }

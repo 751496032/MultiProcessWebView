@@ -11,6 +11,7 @@ import com.hongYi.h5container.bean.JsParam;
 import com.hongYi.h5container.command.CommandHelper;
 import com.hongYi.h5container.main.MainCommandService;
 import com.hongYi.h5container.utils.LogUtils;
+import com.hongYi.h5container.webview.callback.WebViewLifecycleListener;
 import com.hongYi.h5container.webview.callback.WebViewLifecycleObserver;
 import com.hongYi.h5container.webview.settings.WebViewDefaultSettings;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -30,6 +31,8 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
     public static final String TAG = "X5WebView";
 
     private OnScrollChangedListener mOnScrollChangedListener;
+
+    private WebViewLifecycleListener mLifecycleListener;
 
     private String mJsObject;
 
@@ -75,26 +78,26 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
      * js调用原生统一函数
      *
      * @param jsParam js传入的参数，json字符串，格式如下：
-     * {"name":"login","param":{"targetClassName":"com.xxx","callbackNameKeys":["success_nativetojs_callback_1633683965180_6434","fail_nativetojs_callback_1633683965180_6434","complete_nativetojs_callback_1633683965180_6434"]}}
-     * 其中param对象中callbackNameKeys字段是一定存在的，当没有Js没有回调函数时，是一个空数组，其他字段都是业务字段
+     *                {"name":"login","param":{"targetClassName":"com.xxx","callbackNameKeys":["success_nativetojs_callback_1633683965180_6434","fail_nativetojs_callback_1633683965180_6434","complete_nativetojs_callback_1633683965180_6434"]}}
+     *                其中param对象中callbackNameKeys字段是一定存在的，当没有Js没有回调函数时，是一个空数组，其他字段都是业务字段
      */
     @JavascriptInterface
     public void takeNativeAction(String jsParam) {
-        LogUtils.i("takeNativeAction: " + jsParam +"  destroy: "+mIsDestroy);
+        LogUtils.i("takeNativeAction: " + jsParam + "  destroy: " + mIsDestroy);
         if (TextUtils.isEmpty(jsParam)) return;
         Gson gson = new Gson();
         JsParam jsParamObject = gson.fromJson(jsParam, JsParam.class);
         String params = gson.toJson(jsParamObject.param);
-        if (mIsDestroy){
+        if (mIsDestroy) {
             Map map = gson.fromJson(params, Map.class);
-            CommandHelper.Companion.getINSTANCE().unregisterJsCallback(map,this);
+            CommandHelper.Companion.getINSTANCE().unregisterJsCallback(map, this);
             return;
         }
         WebViewCommandDispatcher.Companion.getINSTANCE().dispatcherCommand(jsParamObject.name, params, this);
     }
 
     @JavascriptInterface
-    public void config(String jsParam){
+    public void config(String jsParam) {
         LogUtils.i("config: " + jsParam);
     }
 
@@ -102,7 +105,7 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
      * 将结果回调给Js
      *
      * @param callbackNameKey Js回调函数名称key，在Js中会根据key来查找对应回调函数
-     * @param response  Json字符串
+     * @param response        Json字符串
      */
     public void handleWebCallback(final String callbackNameKey, final String response) {
         LogUtils.i("handleWebCallback  callbackNameKey: " + callbackNameKey + "  response: " + response);
@@ -115,9 +118,10 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
 
     /**
      * 注销Js的回调函数
+     *
      * @param callbackNameKey
      */
-    public void  unregisterJsCallback(final String callbackNameKey){
+    public void unregisterJsCallback(final String callbackNameKey) {
         LogUtils.i("unregisterJsCallback  callbackNameKey: " + callbackNameKey);
         if (TextUtils.isEmpty(callbackNameKey)) return;
         String jscode = "javascript:window.unregisterJsCallback('" + callbackNameKey + "')";
@@ -127,7 +131,7 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
 
 
     public void injectedCustomJscode(final String jscode) {
-        LogUtils.i("injectedCustomJscode  jscode: " +jscode);
+        LogUtils.i("injectedCustomJscode  jscode: " + jscode);
         if (TextUtils.isEmpty(jscode)) return;
         post(new Runnable() {
             @Override
@@ -144,12 +148,11 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
 
 
     @Deprecated
-    public void injectedCustomJscode(){
-        String js="javascript:(function(){" +
+    public void injectedCustomJscode() {
+        String js = "javascript:(function(){" +
                 "document.documentElement.style.overflow='visible';})()";
         injectedCustomJscode(js);
     }
-
 
 
     @Override
@@ -166,7 +169,7 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
 
     @Override
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
-        LogUtils.i("overScrollBy: "+ deltaY +"  "+ scrollY +"  "+ scrollRangeY);
+        LogUtils.i("overScrollBy: " + deltaY + "  " + scrollY + "  " + scrollRangeY);
         return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent);
     }
 
@@ -182,21 +185,35 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
     public void onStart() {
         LogUtils.i("WebView Lifecycle: onStart");
         mIsDestroy = false;
+        if (mLifecycleListener != null) {
+            mLifecycleListener.onStart();
+        }
     }
 
     @Override
     public void onStop() {
         LogUtils.i("WebView Lifecycle: onStop");
+        if (mLifecycleListener != null) {
+            mLifecycleListener.onStop();
+        }
     }
 
     @Override
     public void onDestroy() {
         LogUtils.i("WebView Lifecycle: onDestroy");
         mIsDestroy = true;
+        if (mLifecycleListener != null) {
+            mLifecycleListener.onDestroy();
+        }
     }
 
     public boolean isDestroy() {
         return mIsDestroy;
+    }
+
+    public X5WebView setWebViewLifecycleListener(WebViewLifecycleListener lifecycleListener) {
+        mLifecycleListener = lifecycleListener;
+        return this;
     }
 
     public interface OnScrollChangedListener {
@@ -204,8 +221,10 @@ public class X5WebView extends WebView implements WebViewLifecycleObserver {
     }
 
 
-    public void setOnScrollChangedListener(OnScrollChangedListener onScrollChangedListener) {
+    public X5WebView setOnScrollChangedListener(OnScrollChangedListener onScrollChangedListener) {
         mOnScrollChangedListener = onScrollChangedListener;
+        return this;
     }
+
 
 }

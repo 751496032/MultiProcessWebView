@@ -36,11 +36,19 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(':module_webview')
+    implementation project(':module_download')
+    implementation project(':module_share2')
+    implementation project(':module_function')
     implementation "androidx.core:core-ktx:1.1.16"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     kapt 'com.google.auto.service:auto-service:1.0'
     implementation 'com.google.auto.service:auto-service:1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation 'com.ycjiang:ImagePreview:2.3.7'
+    //    扫描二维码
+    implementation 'com.github.yuzhiqiang1993:zxing:2.1.4'
+
 
 }
 repositories {
