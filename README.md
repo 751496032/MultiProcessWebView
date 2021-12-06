@@ -1,4 +1,42 @@
+
 @[toc]
+
+## 更新记录
+
+### 2021-12-06
+
+ - WebView支持多进程多任务显示，类似微信小程序切换效果。WebView最多启动4个任务，当达到4个任务进程时，会将最早启动的进程关闭掉，然后启动一个新的任务进程。
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/ee6699611b5d439ea240a4683fbb755e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBASC5aV2Vp,size_15,color_FFFFFF,t_70,g_se,x_16)
+
+
+### 2021-10-20
+
+- 提供接口外部监听使用
+- WebView与Activity或Fragment生命周期绑定
+- 处理重定向问题，兼容Android7.0以下，设置WebViewCallback#onInterceptLoading(..)
+
+
+```
+// 获取指定命令的实例
+val command = CommandHelper.INSTANCE.getCommand<CommandLogin>("login")
+// 注册监听，必须在WebView启动前设置监听
+command?.registerCommandMonitor(object : ICommandMonitor {
+         override fun onMonitor(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+                Toast.makeText(App.INSTANCE, "登录中...", Toast.LENGTH_LONG).show()
+
+          }
+
+        })
+        
+        
+```
+
+
+
+ 
+
 ## 前言概述
 几乎所有的App都会用到WebView组件，用WebView承载业务功能也是一种选择，毕竟不用等待应用市场的审核，提升业务上线与bug修复的及时性，但WebView加载业务功能，也有很大的缺陷，体验不好(主要体现在加载、交互上)、耗内存；**耗内存的问题这里提供多进程的设计方案，让WebView在单独的一个进程中运行，这样做的好处是分担主进程的内存压力，另外WebView进程发生崩溃了，也不会影响到主进程的正常运行。**
 
@@ -34,7 +72,7 @@ com.tencent.mm:appbrand ：小程序进程，微信每启动一个小程序，�
  Intent intent = new Intent(this, WebViewActivity.class);
  intent.putExtra(Constants.URL, url);
  intent.putExtra(Constants.TITLE, title);
- intent.putExtra(Constants.JS_OBJECT_NAME,"xxwebview");
+ intent.putExtra(Constants.JS_OBJECT_NAME,"hYi");
  startActivity(intent);
 ```
 如果需要与Js进行交互的话，必须携带Constants.JS_OBJECT_NAME的参数。如果定制需要可以继承WebViewActivity和WebViewFragment进行修改。
@@ -42,11 +80,13 @@ com.tencent.mm:appbrand ：小程序进程，微信每启动一个小程序，�
 如果不想使用默认的WebViewActivity，可以直接使用封装过WebView，如下：
 
 ```java
-WebViewManager.with(mActivity)
-             .setViewContainer(webViewContainer)
-             .setJsObjectName(mJsName)
-             .setWebUrl(mUrl)
-             .load()
+   mWebView = WebViewManager.newBuilder(this)
+                .setRootView(webViewContainer)
+                .injectedJsObject(mJsName)
+                .setWebUrl(mUrl)
+                .setWebViewCallback(this)
+                .build()
+                .start()
 ```
 其中setViewContainer()是传入WebView的父容器。另外如果此时需要多进程的话，必须在你定制的Activity中声明process属性，如下：
 ```html
@@ -72,13 +112,13 @@ WebViewManager.with(mActivity)
 
 ```kotlin
 @AutoService(Command::class)
-class CommandShowToast : Command {
+class CommandShowToast : BaseCommand() {
 
     override fun commandName(): String {
         return "showToast"
     }
 
-    override fun executeCommand(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
+    override fun execCommand(parameters: Map<*, *>, callback: ICallbackFromMainToWebInterface) {
         LogUtils.d("executeCommand curr thread "+ Thread.currentThread().name)
         Toast.makeText(App.INSTANCE, parameters["message"].toString(), Toast.LENGTH_SHORT).show()
     }
@@ -89,7 +129,7 @@ class CommandShowToast : Command {
 
 在executeCommand()方法中实现功能，其中commandName()方法是定义命令名称，需要与Js发送出来是对应一致的，否则executeCommand()方法是无法触发的，即Js调用原生函数会失败。如下
 
-> 这里需要与前端协调商量好
+> 这需要与前端协调商量好，推荐前端直接使用 https://github.com/751496032/hYi-jssdk ，封装Js与Native交互函数，适配了Android与iOS系统，模仿微信公众号jssdk，前端可以通过CDN方式引用Js文件
 
 ```javascript
 function callAppToast(){
@@ -109,6 +149,8 @@ global.takeNativeAction = function(commandName, parameters){
 Js发送携带的参数，可以在executeCommand()方法中parameters中取出。
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/290bb27011e540b6802a45d8c3f906ef.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2h6dzIwMTc=,size_16,color_FFFFFF,t_70)
+
+
 
 ## 命令模式
 其实整个流程就是基于命令模式来实现的，是这个方案的核心。开发者只需关注本身业务的实现，中间的流程无需去关心。
@@ -135,32 +177,31 @@ Js发送携带的参数，可以在executeCommand()方法中parameters中取出�
 在客户端能处理的更多是在第一阶段，WebView初始化阶段，这里的预加载就是将WebView提前初始化完成。WebViewPool
 
 ```java
-  public X5WebView getX5WebView(Context context) {
-      if (sX5WebViewStackCached.isEmpty()) {
-          X5WebView webView = createX5WebView(context);
-          sX5WebViewStackCached.push(webView);
-          return webView;
-      }
-      // 使用栈顶的
-      X5WebView webView = sX5WebViewStackCached.pop();
-      // WebView不为空，则开始使用预创建的WebView，并且替换Context
-      MutableContextWrapper contextWrapper = (MutableContextWrapper) webView.getContext();
-      contextWrapper.setBaseContext(context.getApplicationContext());
-      return webView;
-  }
+ public X5WebView getX5WebView(Context context) {
+        // 使用栈顶的
+        X5WebView webView = mWebViewStackCached.pop();
+        if (webView == null) {
+            prepare(context);
+            webView = mWebViewStackCached.pop();
+        }
+        // WebView不为空，则开始使用预创建的WebView，并且替换Context
+        MutableContextWrapper contextWrapper = (MutableContextWrapper) webView.getContext();
+        contextWrapper.setBaseContext(context.getApplicationContext());
+        prepare(context);
+        return webView;
+    }
 ```
 
 离线包方案，可以在闲时先把H5资源静默预下载到本地，然后需要的时候再去从本地加载H5，这种方案是可以缩短白屏的时间，对优化很有帮助，不过实现的难度就有些大了，需要前后端以及App端同时配合完成。
 
 > 参考 https://github.com/al-liu/OCat-MobilePlatform
 
-## Js与native交互
+## 前端使用文档
 
-[Js与native交互的使用文档](https://github.com/751496032/hYi-sdk)
+[前端使用文档](https://github.com/751496032/hYi-sdk)
 
 ##  参考
 
  - [WebView性能、体验分析与优化](https://tech.meituan.com/2017/06/09/webviewperf.html)
  - [基于腾讯x5封源库，提高60%开发效率](https://juejin.cn/post/6844903950785708040#heading-27)
  - [Android WebView独立进程解决方案](https://www.jianshu.com/p/b66c225c19e2)
-
