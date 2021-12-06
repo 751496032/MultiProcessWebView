@@ -7,7 +7,6 @@
 
  - WebView支持多进程多任务显示，类似微信小程序切换效果。WebView最多启动4个任务，当达到4个任务进程时，会将最早启动的进程关闭掉，然后启动一个新的任务进程。
 
-
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/ee6699611b5d439ea240a4683fbb755e.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBASC5aV2Vp,size_15,color_FFFFFF,t_70,g_se,x_16)
 
 
@@ -93,6 +92,31 @@ com.tencent.mm:appbrand ：小程序进程，微信每启动一个小程序，�
 <activity
        android:name=".ui.WebViewActivity"
        android:process=":webview" />
+ // 多进程多任务效果
+  <activity
+            android:name=".ui.WebViewActivity$Small1"
+            android:process=":app_small1"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small1" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small2"
+            android:process=":app_small2"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small2" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small3"
+            android:process=":app_small3"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small3" />
+
+        <activity
+            android:name=".ui.WebViewActivity$Small4"
+            android:process=":app_small4"
+            android:launchMode="singleTask"
+            android:taskAffinity=".small4" />
+      
 ```
 
 关于Js与原生交互的功能实现，下面有讲。
