@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private  val REQUEST_WRITE_STORAGE_PERMISSION = 101
 
-    var data = arrayOf("百度", "豆瓣", "京东商城", "腾讯视频","demo.html", "优化前WebView", "文件下载、解压、展示", "图片预览", "分享")
+    var data = arrayOf("百度", "豆瓣", "京东商城", "腾讯视频","demo.html", "优化前WebView")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,9 +40,6 @@ class MainActivity : AppCompatActivity() {
                 3 -> startActivity(targetClass, "https://v.qq.com/?ptag=qqbsc", data[position])
                 4 -> startActivity(targetClass, Constants.ANDROID_ASSET_URI + "demo.html", data[position])
                 5 -> startActivity(WebViewTestActivity::class.java, "http://lgmy.hmeshop.cn/default.aspx?ReferralId=100831&go=1", data[position])
-                6 -> startActivity(FileOperateActivity::class.java, "", "")
-                7 -> startActivity(TestFunctionActivity::class.java, "", "")
-                8 -> startActivity(ShareContentActivity::class.java, "", "")
             }
         }
 

@@ -1,6 +1,6 @@
-include ':module_share2'
-include ':module_function'
-include ':module_download'
+//include ':module_share2'
+//include ':module_function'
+//include ':module_download'
 include ':module_webview'
 include ':app'
 rootProject.name = "AndroidH5Container"
